@@ -21,6 +21,11 @@ const STOP_WORDS = new Set([
   "with",
   "your"
 ]);
+const DEFAULT_OPENROUTER_MODEL = "meta-llama/llama-3.2-3b-instruct:free";
+
+export function defaultOpenRouterModel() {
+  return DEFAULT_OPENROUTER_MODEL;
+}
 
 export function extractInstagramUrls(text = "") {
   const urls = text.match(INSTAGRAM_MEDIA_URL_RE) ?? [];
@@ -57,6 +62,7 @@ export function createClientExtraction({ rawUrls = "", role = "researcher", capt
 }
 
 export function applyAiSummary(extraction, aiSummary = {}) {
+  assertAiSummaryContent(aiSummary);
   const summarySentence = normalizeSentence(aiSummary.summarySentence || "");
   const takeaways = normalizeList(aiSummary.takeaways).slice(0, 5);
   const actions = normalizeList(aiSummary.actions).slice(0, 4);
@@ -76,6 +82,14 @@ export function applyAiSummary(extraction, aiSummary = {}) {
       ai: aiSummary.model ? { model: aiSummary.model } : undefined
     }))
   };
+}
+
+export function assertAiSummaryContent(aiSummary = {}) {
+  const hasSummarySentence = Boolean(normalizeSentence(aiSummary.summarySentence || ""));
+  const hasTakeaways = normalizeList(aiSummary.takeaways).length > 0;
+  if (!hasSummarySentence && !hasTakeaways) {
+    throw new Error("OpenRouter did not return summary content.");
+  }
 }
 
 export function createMarkdownDocument(items = []) {

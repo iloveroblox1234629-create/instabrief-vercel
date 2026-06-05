@@ -47,4 +47,38 @@ describe("createMarkdownDocument", () => {
     assert.match(file.markdown, /AI Model: openrouter\/auto/);
     assert.match(file.markdown, /Capture the source/);
   });
+
+  it("rejects OpenRouter responses that only identify a model without summary content", () => {
+    const extraction = createClientExtraction({
+      rawUrls: "https://www.instagram.com/reel/DZMEWYFvfyS/"
+    });
+
+    assert.throws(
+      () => applyAiSummary(extraction, {
+        model: "nvidia/nemotron-3.5-content-safety-20260604:free",
+        summarySentence: "",
+        takeaways: [],
+        actions: [],
+        tags: []
+      }),
+      /OpenRouter did not return summary content/
+    );
+  });
+
+  it("rejects OpenRouter responses that contain only tags or actions", () => {
+    const extraction = createClientExtraction({
+      rawUrls: "https://www.instagram.com/reel/DZMEWYFvfyS/"
+    });
+
+    assert.throws(
+      () => applyAiSummary(extraction, {
+        model: "some-model",
+        summarySentence: "",
+        takeaways: [],
+        actions: ["Review the source."],
+        tags: ["instagram"]
+      }),
+      /OpenRouter did not return summary content/
+    );
+  });
 });

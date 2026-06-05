@@ -16,7 +16,7 @@ Set these in Vercel Project Settings, not in Git:
 
 ```sh
 OPENROUTER_API_KEY=...
-OPENROUTER_MODEL=openrouter/auto
+OPENROUTER_MODEL=meta-llama/llama-3.2-3b-instruct:free
 ```
 
 `OPENROUTER_API_KEY` is used only by `api/summarize.js`.

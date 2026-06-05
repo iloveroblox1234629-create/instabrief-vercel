@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   applyAiSummary,
   createClientExtraction,
-  createMarkdownDocument
+  createMarkdownDocument,
+  defaultOpenRouterModel
 } from "./extraction.js";
 
 const themePresets = {
@@ -43,7 +44,7 @@ const initialForm = {
   visualText: "",
   useServerSummary: true,
   clientApiKey: "",
-  clientModel: "openrouter/auto"
+  clientModel: defaultOpenRouterModel()
 };
 
 export default function App() {
@@ -302,7 +303,7 @@ async function requestClientSummary(payload) {
       "X-Title": "InstaBrief"
     },
     body: JSON.stringify({
-      model: payload.clientModel || "openrouter/auto",
+      model: payload.clientModel || defaultOpenRouterModel(),
       messages: [
         {
           role: "system",
@@ -324,7 +325,7 @@ async function requestClientSummary(payload) {
   const content = body?.choices?.[0]?.message?.content || "{}";
   return {
     ...safeJson(content),
-    model: body.model || payload.clientModel || "openrouter/auto"
+    model: body.model || payload.clientModel || defaultOpenRouterModel()
   };
 }
 
