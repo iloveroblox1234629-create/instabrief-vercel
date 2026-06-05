@@ -7,32 +7,32 @@ import {
 } from "./extraction.js";
 
 const themePresets = {
-  slate: {
-    name: "Slate",
-    bg: "#f6f7fb",
-    panel: "#ffffff",
-    text: "#121826",
-    muted: "#5f6b7a",
-    accent: "#2563eb",
-    soft: "#eaf1ff"
+  axolotl: {
+    name: "Axolotl",
+    bg: "#09090d",
+    panel: "#1e1e26",
+    text: "#fcfaff",
+    muted: "#b8b3c4",
+    accent: "#ff87be",
+    soft: "#121218"
   },
-  citrus: {
-    name: "Citrus",
-    bg: "#fbfaf5",
-    panel: "#ffffff",
-    text: "#182018",
-    muted: "#687463",
-    accent: "#2f8f46",
-    soft: "#eef8e8"
+  nebula: {
+    name: "Nebula",
+    bg: "#0b0911",
+    panel: "#1c1826",
+    text: "#fcfaff",
+    muted: "#c3b9d6",
+    accent: "#b988ff",
+    soft: "#181222"
   },
-  mono: {
-    name: "Mono",
-    bg: "#f5f5f4",
-    panel: "#ffffff",
-    text: "#1c1917",
-    muted: "#6b625c",
-    accent: "#111827",
-    soft: "#ececea"
+  cyan: {
+    name: "Cyan",
+    bg: "#061013",
+    panel: "#121e23",
+    text: "#f7feff",
+    muted: "#aac4ca",
+    accent: "#40e0d0",
+    soft: "#0c1f24"
   }
 };
 
@@ -61,7 +61,8 @@ export default function App() {
     "--theme-text": theme.text,
     "--theme-muted": theme.muted,
     "--theme-accent": theme.accent,
-    "--theme-soft": theme.soft
+    "--theme-soft": theme.soft,
+    "--theme-accent-rgb": hexToRgb(theme.accent)
   }), [theme]);
 
   useEffect(() => {
@@ -114,23 +115,25 @@ export default function App() {
   }
 
   return (
-    <main className="min-h-screen bg-app-bg px-4 py-5 text-app-text" style={themeStyle}>
+    <main className="app-shell min-h-screen px-4 py-6 text-app-text" style={themeStyle}>
       <div className="fixed right-4 top-4 z-10">
         <button
           aria-expanded={isThemeOpen}
-          className="rounded-full border border-black/10 bg-app-panel px-4 py-2 text-sm font-black shadow-sm"
+          aria-label="Open theme settings"
+          className="theme-trigger focus-glow"
+          title="Theme"
           type="button"
           onClick={() => setIsThemeOpen((open) => !open)}
         >
-          Theme
+          <span className="theme-trigger-dot" />
         </button>
         {isThemeOpen ? (
-          <section className="absolute right-0 mt-2 w-72 rounded-lg border border-black/10 bg-app-panel p-4 shadow-xl">
-            <h2 className="text-sm font-black">Theme</h2>
-            <div className="mt-3 grid grid-cols-3 gap-2">
+          <section className="glass-panel absolute right-0 mt-3 w-[17rem] rounded-[1.75rem] p-5 shadow-2xl sm:w-72">
+            <h2 className="text-lg font-black text-app-text">Theme</h2>
+            <div className="mt-4 grid grid-cols-3 gap-2">
               {Object.entries(themePresets).map(([key, preset]) => (
                 <button
-                  className="rounded-md border border-black/10 px-2 py-2 text-xs font-black hover:border-app-accent"
+                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-3 text-xs font-black text-app-text transition hover:border-app-accent hover:bg-white/[0.08]"
                   key={key}
                   type="button"
                   onClick={() => setTheme(preset)}
@@ -150,9 +153,9 @@ export default function App() {
                   {label}
                   <input
                     aria-label={label}
-                    className="h-8 w-12 rounded border border-black/10 bg-transparent"
+                    className="h-9 w-12 rounded-full border border-white/10 bg-transparent"
                     type="color"
-                    value={theme[key]}
+                    value={colorInputValue(theme[key])}
                     onChange={(event) => updateTheme(key, event.target.value)}
                   />
                 </label>
@@ -162,23 +165,34 @@ export default function App() {
         ) : null}
       </div>
 
-      <section className="mx-auto flex min-h-[calc(100vh-40px)] w-full max-w-2xl items-center">
-        <form className="w-full rounded-lg border border-black/10 bg-app-panel p-4 shadow-sm sm:p-6" onSubmit={handleSubmit}>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-app-muted">InstaBrief</p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">Download a Markdown summary.</h1>
+      <section className="mx-auto flex min-h-[calc(100vh-48px)] w-full max-w-2xl flex-col items-center justify-center">
+        <header className="mb-8 text-center">
+          <div className="mb-2 flex items-center justify-center gap-3">
+            <span className="brand-mark" aria-hidden="true" />
+            <h1 className="text-gradient text-4xl font-black tracking-tight sm:text-6xl">InstaBrief</h1>
+          </div>
+          <p className="text-lg font-semibold text-app-muted">Turn Instagram links into organized Markdown.</p>
+        </header>
 
-          <label className="mt-6 grid gap-2 text-sm font-black">
+        <form className="glass-panel w-full overflow-hidden rounded-[2rem] p-5 shadow-2xl sm:p-8" onSubmit={handleSubmit}>
+          <div className="panel-accent" />
+          <div className="text-center">
+            <h2 className="text-2xl font-black tracking-tight text-app-text">Download a Markdown summary</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-app-muted">Paste one Reel link and get a one-file download.</p>
+          </div>
+
+          <label className="mt-7 grid gap-2 text-sm font-black text-app-text">
             Instagram link
             <input
-              className="rounded-md border border-black/10 bg-white px-3 py-3 font-medium text-slate-900 outline-app-accent"
+              className="app-input focus-glow"
               placeholder="https://www.instagram.com/reel/..."
               value={form.rawUrls}
               onChange={(event) => updateField("rawUrls", event.target.value)}
             />
           </label>
 
-          <div className="mt-4 rounded-md border border-black/10 bg-app-soft p-3">
-            <label className="flex items-start gap-3 text-sm font-black">
+          <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-app-soft p-4">
+            <label className="flex items-start gap-3 text-sm font-black text-app-text">
               <input
                 className="mt-0.5 h-5 w-5 accent-[var(--theme-accent)]"
                 type="checkbox"
@@ -193,20 +207,20 @@ export default function App() {
 
             {!form.useServerSummary ? (
               <div className="mt-3 grid gap-3">
-                <label className="grid gap-2 text-sm font-black">
+                <label className="grid gap-2 text-sm font-black text-app-text">
                   Client OpenRouter API key
                   <input
-                    className="rounded-md border border-black/10 bg-white px-3 py-2 font-medium text-slate-900 outline-app-accent"
+                    className="app-input focus-glow"
                     placeholder="sk-or-..."
                     type="password"
                     value={form.clientApiKey}
                     onChange={(event) => updateField("clientApiKey", event.target.value)}
                   />
                 </label>
-                <label className="grid gap-2 text-sm font-black">
+                <label className="grid gap-2 text-sm font-black text-app-text">
                   Model
                   <input
-                    className="rounded-md border border-black/10 bg-white px-3 py-2 font-medium text-slate-900 outline-app-accent"
+                    className="app-input focus-glow"
                     value={form.clientModel}
                     onChange={(event) => updateField("clientModel", event.target.value)}
                   />
@@ -216,13 +230,13 @@ export default function App() {
             ) : null}
           </div>
 
-          <details className="mt-4 rounded-md border border-black/10 bg-white/70 p-3">
-            <summary className="cursor-pointer text-sm font-black">Optional context</summary>
+          <details className="mt-4 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4">
+            <summary className="cursor-pointer text-sm font-black text-app-text">Optional context</summary>
             <div className="mt-4 grid gap-4">
-              <label className="grid gap-2 text-sm font-black">
+              <label className="grid gap-2 text-sm font-black text-app-text">
                 Role
                 <select
-                  className="rounded-md border border-black/10 bg-white px-3 py-2 text-slate-900 outline-app-accent"
+                  className="app-input focus-glow"
                   value={form.role}
                   onChange={(event) => updateField("role", event.target.value)}
                 >
@@ -233,26 +247,26 @@ export default function App() {
                   <option value="casual">Quick TL;DR</option>
                 </select>
               </label>
-              <label className="grid gap-2 text-sm font-black">
+              <label className="grid gap-2 text-sm font-black text-app-text">
                 Caption or description
                 <textarea
-                  className="min-h-20 rounded-md border border-black/10 bg-white px-3 py-2 font-medium text-slate-900 outline-app-accent"
+                  className="app-input min-h-20 focus-glow"
                   value={form.caption}
                   onChange={(event) => updateField("caption", event.target.value)}
                 />
               </label>
-              <label className="grid gap-2 text-sm font-black">
+              <label className="grid gap-2 text-sm font-black text-app-text">
                 Transcript
                 <textarea
-                  className="min-h-24 rounded-md border border-black/10 bg-white px-3 py-2 font-medium text-slate-900 outline-app-accent"
+                  className="app-input min-h-24 focus-glow"
                   value={form.transcript}
                   onChange={(event) => updateField("transcript", event.target.value)}
                 />
               </label>
-              <label className="grid gap-2 text-sm font-black">
+              <label className="grid gap-2 text-sm font-black text-app-text">
                 Visual notes
                 <textarea
-                  className="min-h-20 rounded-md border border-black/10 bg-white px-3 py-2 font-medium text-slate-900 outline-app-accent"
+                  className="app-input min-h-20 focus-glow"
                   value={form.visualText}
                   onChange={(event) => updateField("visualText", event.target.value)}
                 />
@@ -262,7 +276,7 @@ export default function App() {
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             <button
-              className="rounded-md bg-app-accent px-5 py-3 text-sm font-black text-white shadow-sm disabled:opacity-60"
+              className="gradient-primary glow-hover min-h-14 flex-1 rounded-2xl px-5 py-4 text-base font-black text-[#520031] shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
               disabled={isWorking}
               type="submit"
             >
@@ -270,7 +284,7 @@ export default function App() {
             </button>
             {latestFile ? (
               <button
-                className="rounded-md border border-app-accent px-4 py-3 text-sm font-black text-app-accent"
+                className="min-h-14 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 text-sm font-black text-app-text transition hover:border-app-accent hover:text-app-accent"
                 type="button"
                 onClick={() => downloadMarkdown(latestFile)}
               >
@@ -371,10 +385,20 @@ function downloadMarkdown(file) {
 function readTheme() {
   try {
     return {
-      ...themePresets.slate,
+      ...themePresets.axolotl,
       ...JSON.parse(localStorage.getItem("instabrief-theme") || "{}")
     };
   } catch {
-    return themePresets.slate;
+    return themePresets.axolotl;
   }
+}
+
+function hexToRgb(value = "#ff87be") {
+  const normalized = colorInputValue(value).replace("#", "");
+  const number = parseInt(normalized, 16);
+  return `${(number >> 16) & 255}, ${(number >> 8) & 255}, ${number & 255}`;
+}
+
+function colorInputValue(value = "#ff87be") {
+  return /^#[0-9a-f]{6}$/i.test(value) ? value : "#ff87be";
 }
