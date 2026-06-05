@@ -4,11 +4,13 @@ import { afterEach, describe, it } from "node:test";
 import handler from "../api/summarize.js";
 
 const originalFetch = globalThis.fetch;
+const originalAbortSignalTimeout = globalThis.AbortSignal.timeout;
 const originalKey = process.env.OPENROUTER_API_KEY;
 const originalModel = process.env.OPENROUTER_MODEL;
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  globalThis.AbortSignal.timeout = originalAbortSignalTimeout;
   restoreEnv("OPENROUTER_API_KEY", originalKey);
   restoreEnv("OPENROUTER_MODEL", originalModel);
 });
@@ -43,7 +45,7 @@ describe("summarize API", () => {
     const response = createResponse();
     await handler({
       method: "POST",
-      headers: { origin: "https://example.com" },
+      headers: allowedHeaders(),
       body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
     }, response);
 
@@ -75,12 +77,131 @@ describe("summarize API", () => {
     const response = createResponse();
     await handler({
       method: "POST",
-      headers: { origin: "https://example.com" },
+      headers: allowedHeaders(),
       body: { rawUrls: "https://www.instagram.com/reel/DZMEWYFvfyS/" }
     }, response);
 
     assert.equal(response.statusCode, 502);
     assert.match(response.body.error, /OpenRouter did not return summary content/);
+  });
+
+  it("rejects malformed JSON request bodies", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+
+    const response = createResponse();
+    await handler({
+      method: "POST",
+      headers: allowedHeaders(),
+      body: "{bad json"
+    }, response);
+
+    assert.equal(response.statusCode, 400);
+    assert.match(response.body.error, /valid JSON/);
+  });
+
+  it("rejects requests without a supported Instagram media URL before using OpenRouter", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+    let calledOpenRouter = false;
+    globalThis.fetch = async () => {
+      calledOpenRouter = true;
+      return { ok: true, json: async () => ({}) };
+    };
+
+    const response = createResponse();
+    await handler({
+      method: "POST",
+      headers: allowedHeaders(),
+      body: { rawUrls: "" }
+    }, response);
+
+    assert.equal(response.statusCode, 400);
+    assert.match(response.body.error, /Instagram media URL/);
+    assert.equal(calledOpenRouter, false);
+  });
+
+  it("rejects browser requests from other origins before using OpenRouter", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+    let calledOpenRouter = false;
+    globalThis.fetch = async () => {
+      calledOpenRouter = true;
+      return { ok: true, json: async () => ({}) };
+    };
+
+    const response = createResponse();
+    await handler({
+      method: "POST",
+      headers: {
+        host: "instabrief-vercel.vercel.app",
+        origin: "https://attacker.example"
+      },
+      body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
+    }, response);
+
+    assert.equal(response.statusCode, 403);
+    assert.equal(calledOpenRouter, false);
+  });
+
+  it("returns the upstream status when OpenRouter sends a non-JSON error body", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+    globalThis.fetch = async () => ({
+      ok: false,
+      status: 429,
+      json: async () => {
+        throw new Error("not json");
+      }
+    });
+
+    const response = createResponse();
+    await handler({
+      method: "POST",
+      headers: allowedHeaders(),
+      body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
+    }, response);
+
+    assert.equal(response.statusCode, 429);
+    assert.equal(response.body.error, "OpenRouter request failed.");
+  });
+
+  it("returns 502 when OpenRouter returns malformed summary JSON", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+    globalThis.fetch = async (url) => {
+      if (String(url).includes("instagram.com")) {
+        return { ok: false, status: 404 };
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{ message: { content: "not json {bad}" } }]
+        })
+      };
+    };
+
+    const response = createResponse();
+    await handler({
+      method: "POST",
+      headers: allowedHeaders(),
+      body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
+    }, response);
+
+    assert.equal(response.statusCode, 502);
+    assert.match(response.body.error, /summary content/);
+  });
+
+  it("returns 504 when the OpenRouter request times out", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+    globalThis.AbortSignal.timeout = () => {
+      throw Object.assign(new Error("timed out"), { name: "TimeoutError" });
+    };
+
+    const response = createResponse();
+    await handler({
+      method: "POST",
+      headers: allowedHeaders(),
+      body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
+    }, response);
+
+    assert.equal(response.statusCode, 504);
+    assert.match(response.body.error, /timed out/);
   });
 
   it("fetches public Instagram metadata before asking OpenRouter to summarize", async () => {
@@ -128,7 +249,7 @@ describe("summarize API", () => {
     const response = createResponse();
     await handler({
       method: "POST",
-      headers: { origin: "https://example.com" },
+      headers: allowedHeaders(),
       body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
     }, response);
 
@@ -174,7 +295,7 @@ describe("summarize API", () => {
     const response = createResponse();
     await handler({
       method: "POST",
-      headers: { origin: "https://example.com" },
+      headers: allowedHeaders(),
       body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
     }, response);
 
@@ -195,6 +316,13 @@ function createResponse() {
       this.body = body;
       return this;
     }
+  };
+}
+
+function allowedHeaders() {
+  return {
+    host: "instabrief-vercel.vercel.app",
+    origin: "https://instabrief-vercel.vercel.app"
   };
 }
 

@@ -46,6 +46,7 @@ const initialForm = {
   clientApiKey: "",
   clientModel: defaultOpenRouterModel()
 };
+const SUMMARY_TIMEOUT_MS = 25000;
 
 export default function App() {
   const [form, setForm] = useState(initialForm);
@@ -53,6 +54,7 @@ export default function App() {
   const [isThemeOpen, setIsThemeOpen] = useState(false);
   const [status, setStatus] = useState("Paste a link to start.");
   const [latestFile, setLatestFile] = useState(null);
+  const [pendingFallback, setPendingFallback] = useState(null);
   const [isWorking, setIsWorking] = useState(false);
 
   const themeStyle = useMemo(() => ({
@@ -72,6 +74,7 @@ export default function App() {
   async function handleSubmit(event) {
     event.preventDefault();
     setIsWorking(true);
+    setPendingFallback(null);
     setStatus(form.useServerSummary ? "Preparing server summary..." : "Preparing client summary...");
 
     try {
@@ -95,9 +98,8 @@ export default function App() {
       const localOnly = createClientExtraction(form);
       if (localOnly.items.length) {
         const markdownFile = createMarkdownDocument(localOnly.items);
-        setLatestFile(markdownFile);
-        downloadMarkdown(markdownFile);
-        setStatus(`${error instanceof Error ? error.message : "AI summary failed."} Downloaded local fallback.`);
+        setPendingFallback(markdownFile);
+        setStatus(`${error instanceof Error ? error.message : "AI summary failed."} Local fallback is ready if you want it.`);
       } else {
         setStatus(error instanceof Error ? error.message : "Extraction failed.");
       }
@@ -112,6 +114,16 @@ export default function App() {
 
   function updateTheme(name, value) {
     setTheme((current) => ({ ...current, [name]: value }));
+  }
+
+  function downloadPendingFallback() {
+    if (!pendingFallback) {
+      return;
+    }
+    downloadMarkdown(pendingFallback);
+    setLatestFile(pendingFallback);
+    setPendingFallback(null);
+    setStatus(`Downloaded ${pendingFallback.filename}.`);
   }
 
   return (
@@ -291,6 +303,15 @@ export default function App() {
                 Download again
               </button>
             ) : null}
+            {pendingFallback ? (
+              <button
+                className="min-h-14 rounded-2xl border border-app-accent bg-white/[0.04] px-5 py-4 text-sm font-black text-app-accent transition hover:bg-white/[0.08]"
+                type="button"
+                onClick={downloadPendingFallback}
+              >
+                Download local fallback
+              </button>
+            ) : null}
           </div>
           <p className="mt-3 min-h-6 text-sm font-bold text-app-muted" role="status">{status}</p>
         </form>
@@ -300,17 +321,21 @@ export default function App() {
 }
 
 async function requestServerSummary(payload) {
+  const signal = AbortSignal.timeout(SUMMARY_TIMEOUT_MS);
   const response = await fetch("/api/summarize", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    signal
   });
   return parseSummaryResponse(response);
 }
 
 async function requestClientSummary(payload) {
+  const signal = AbortSignal.timeout(SUMMARY_TIMEOUT_MS);
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
+    signal,
     headers: {
       "Authorization": `Bearer ${payload.clientApiKey.trim()}`,
       "Content-Type": "application/json",
@@ -367,7 +392,14 @@ function safeJson(value) {
     return JSON.parse(value);
   } catch {
     const match = String(value).match(/\{[\s\S]*\}/);
-    return match ? JSON.parse(match[0]) : {};
+    if (!match) {
+      return {};
+    }
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return {};
+    }
   }
 }
 

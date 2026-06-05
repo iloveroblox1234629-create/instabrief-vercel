@@ -180,18 +180,18 @@ export function summarizeInputs({ role = "researcher", caption = "", transcript 
 export function buildMarkdown({ url, type, role, summary, tags, extraction, ai }) {
   const titleType = titleForType(type);
   return [
-    `# ${createSummarySentence({ type, summary })}`,
+    `# ${escapeMarkdownText(createSummarySentence({ type, summary }))}`,
     "",
-    `- URL: ${url}`,
-    `- Type: ${titleType}`,
-    `- Role: ${role}`,
-    `- Tags: ${(tags || []).join(", ") || "untagged"}`,
-    extraction?.ok ? `- Extracted Title: ${extraction.title || "Untitled"}` : "",
-    extraction && !extraction.ok ? `- Extraction Status: ${extraction.error}` : "",
-    ai?.model ? `- AI Model: ${ai.model}` : "",
+    `- URL: ${escapeMarkdownText(url)}`,
+    `- Type: ${escapeMarkdownText(titleType)}`,
+    `- Role: ${escapeMarkdownText(role)}`,
+    `- Tags: ${escapeMarkdownText((tags || []).join(", ") || "untagged")}`,
+    extraction?.ok ? `- Extracted Title: ${escapeMarkdownText(extraction.title || "Untitled")}` : "",
+    extraction && !extraction.ok ? `- Extraction Status: ${escapeMarkdownText(extraction.error)}` : "",
+    ai?.model ? `- AI Model: ${escapeMarkdownText(ai.model)}` : "",
     "",
     "## Summary",
-    summary.hook || "No summary sentence detected yet.",
+    escapeMarkdownText(summary.hook || "No summary sentence detected yet."),
     "",
     "## Takeaways",
     formatList(summary.takeaways),
@@ -222,7 +222,7 @@ function buildItem({ url, type, role, summary, tags, extraction, ai }) {
 }
 
 function normalizeInstagramUrl(value) {
-  const parsed = safeUrl(value);
+  const parsed = safeUrl(trimTrailingUrlPunctuation(value));
   if (!parsed) {
     return value;
   }
@@ -236,6 +236,10 @@ function safeUrl(value) {
   } catch {
     return null;
   }
+}
+
+function trimTrailingUrlPunctuation(value = "") {
+  return String(value).replace(/[),.;:]+$/g, "");
 }
 
 function readShortcode(parsed) {
@@ -318,5 +322,14 @@ function normalizeList(value) {
 }
 
 function formatList(items) {
-  return items?.length ? items.map((item) => `- ${item}`).join("\n") : "- Not provided.";
+  return items?.length ? items.map((item) => `- ${escapeMarkdownText(item)}`).join("\n") : "- Not provided.";
+}
+
+function escapeMarkdownText(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\r?\n/g, " ")
+    .trim();
 }

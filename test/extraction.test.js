@@ -15,6 +15,13 @@ describe("extractInstagramUrls", () => {
       ["https://www.instagram.com/reel/ABC/?utm_source=keep"]
     );
   });
+
+  it("trims common punctuation copied after an Instagram URL", () => {
+    assert.deepEqual(
+      extractInstagramUrls("Watch https://www.instagram.com/reel/ABC123/?utm_source=ig_web_copy_link,"),
+      ["https://www.instagram.com/reel/ABC123/?utm_source=ig_web_copy_link"]
+    );
+  });
 });
 
 describe("createMarkdownDocument", () => {
@@ -46,6 +53,24 @@ describe("createMarkdownDocument", () => {
     assert.equal(file.filename, "a-concise-framework-for-turning-posts-into-reusable-research-notes.md");
     assert.match(file.markdown, /AI Model: openrouter\/auto/);
     assert.match(file.markdown, /Capture the source/);
+  });
+
+  it("escapes generated Markdown text that could render HTML", () => {
+    const extraction = createClientExtraction({
+      rawUrls: "https://www.instagram.com/reel/ABC123/",
+      caption: "How <script>alert(1)</script> becomes safe notes."
+    });
+    const withAi = applyAiSummary(extraction, {
+      summarySentence: "How <script>alert(1)</script> becomes safe notes.",
+      takeaways: ["Review <img src=x onerror=alert(1)> safely."],
+      actions: [],
+      tags: ["security"]
+    });
+    const file = createMarkdownDocument(withAi.items);
+
+    assert.doesNotMatch(file.markdown, /<script>/);
+    assert.match(file.markdown, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+    assert.match(file.markdown, /&lt;img src=x onerror=alert\(1\)&gt;/);
   });
 
   it("rejects OpenRouter responses that only identify a model without summary content", () => {
