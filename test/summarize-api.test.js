@@ -14,7 +14,7 @@ afterEach(() => {
 });
 
 describe("summarize API", () => {
-  it("defaults to an explicit text generation model instead of the auto router", async () => {
+  it("defaults to a free structured-output OpenRouter model", async () => {
     delete process.env.OPENROUTER_MODEL;
     process.env.OPENROUTER_API_KEY = "test-key";
     let requestBody;
@@ -47,7 +47,7 @@ describe("summarize API", () => {
       body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
     }, response);
 
-    assert.equal(requestBody.model, "meta-llama/llama-3.2-3b-instruct:free");
+    assert.equal(requestBody.model, "openai/gpt-oss-120b:free");
     assert.equal(response.statusCode, 200);
   });
 

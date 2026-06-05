@@ -21,7 +21,7 @@ const STOP_WORDS = new Set([
   "with",
   "your"
 ]);
-const DEFAULT_OPENROUTER_MODEL = "meta-llama/llama-3.2-3b-instruct:free";
+const DEFAULT_OPENROUTER_MODEL = "openai/gpt-oss-120b:free";
 
 export function defaultOpenRouterModel() {
   return DEFAULT_OPENROUTER_MODEL;
