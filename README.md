@@ -4,6 +4,12 @@ React + Tailwind version of InstaBrief with browser-local extraction and an opti
 
 Production: https://instabrief-vercel.vercel.app
 
+## Summary Modes
+
+- Server-side: uses `OPENROUTER_API_KEY` from Vercel environment variables.
+- Client-side: uncheck server-side summaries in the UI and paste a temporary OpenRouter key. The key stays in browser memory for that tab and is sent directly to OpenRouter.
+- Local fallback: when no key is available or an AI request fails, the app still downloads a locally generated Markdown file.
+
 ## Environment
 
 Set these in Vercel Project Settings, not in Git:
