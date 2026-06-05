@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --theme-bg: #f6f7fb;
+  --theme-panel: #ffffff;
+  --theme-text: #121826;
+  --theme-muted: #5f6b7a;
+  --theme-accent: #2563eb;
+  --theme-soft: #eaf1ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--theme-bg);
+  color: var(--theme-text);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input[type="color"] {
+  padding: 0;
+}
