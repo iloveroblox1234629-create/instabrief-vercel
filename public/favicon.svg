@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="InstaBrief">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="25%" r="80%">
+      <stop offset="0%" stop-color="#2a1825" />
+      <stop offset="55%" stop-color="#121218" />
+      <stop offset="100%" stop-color="#09090d" />
+    </radialGradient>
+    <linearGradient id="mark" x1="12" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff9ece" />
+      <stop offset="100%" stop-color="#ff67ac" />
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#bg)" />
+  <rect x="3.5" y="3.5" width="57" height="57" rx="15" fill="none" stroke="#ffffff" stroke-opacity="0.08" />
+  <g filter="url(#glow)">
+    <circle cx="28" cy="34" r="13.5" fill="none" stroke="url(#mark)" stroke-width="5.5" />
+    <circle cx="46" cy="16" r="5.2" fill="none" stroke="url(#mark)" stroke-width="4" />
+  </g>
+</svg>
