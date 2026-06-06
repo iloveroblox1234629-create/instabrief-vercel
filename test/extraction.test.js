@@ -5,6 +5,7 @@ import {
   applyAiSummary,
   createClientExtraction,
   createMarkdownDocument,
+  createTemplatePromptText,
   extractInstagramUrls
 } from "../src/extraction.js";
 
@@ -33,7 +34,27 @@ describe("createMarkdownDocument", () => {
     const file = createMarkdownDocument(extraction.items);
 
     assert.equal(file.filename, "how-to-organize-saved-reels-into-research-notes.md");
+    assert.match(file.markdown, /^---\ntitle: "How to organize saved reels into research notes"/);
+    assert.match(file.markdown, /source: "instagram"/);
+    assert.match(file.markdown, /platform: "Instagram"/);
+    assert.match(file.markdown, /shortcode: "ABC123"/);
+    assert.match(file.markdown, /template: "general"/);
+    assert.match(file.markdown, /aiModel: "local-fallback"/);
     assert.match(file.markdown, /# How to organize saved reels into research notes/);
+  });
+
+  it("uses template-specific local fallback actions and notes", () => {
+    const extraction = createClientExtraction({
+      rawUrls: "https://www.instagram.com/reel/FOOD123/",
+      caption: "Fast weeknight pasta with lemon, butter, and parmesan.",
+      template: "recipe"
+    });
+    const file = createMarkdownDocument(extraction.items);
+
+    assert.match(file.markdown, /template: "recipe"/);
+    assert.match(file.markdown, /- Template: Recipe/);
+    assert.match(file.markdown, /List the ingredients, estimate measurements, and verify cook times/);
+    assert.match(file.markdown, /ingredients, steps, substitutions, timing, and grocery items/);
   });
 
   it("uses OpenRouter summary output when present", () => {
@@ -52,6 +73,7 @@ describe("createMarkdownDocument", () => {
 
     assert.equal(file.filename, "a-concise-framework-for-turning-posts-into-reusable-research-notes.md");
     assert.match(file.markdown, /AI Model: openrouter\/auto/);
+    assert.match(file.markdown, /aiModel: "openrouter\/auto"/);
     assert.match(file.markdown, /Capture the source/);
   });
 
@@ -105,5 +127,12 @@ describe("createMarkdownDocument", () => {
       }),
       /OpenRouter did not return summary content/
     );
+  });
+});
+
+describe("createTemplatePromptText", () => {
+  it("includes selected template guidance for AI prompts", () => {
+    assert.match(createTemplatePromptText("travel"), /Template: Travel/);
+    assert.match(createTemplatePromptText("travel"), /itinerary ideas/);
   });
 });

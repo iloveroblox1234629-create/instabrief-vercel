@@ -50,7 +50,53 @@ describe("summarize API", () => {
     }, response);
 
     assert.equal(requestBody.model, "openai/gpt-oss-120b:free");
+    assert.match(requestBody.messages[1].content, /Template: General/);
     assert.equal(response.statusCode, 200);
+  });
+
+  it("includes the selected extraction template in the OpenRouter prompt", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+    let openRouterPrompt = "";
+    globalThis.fetch = async (url, options = {}) => {
+      if (String(url).includes("instagram.com")) {
+        return { ok: false, status: 404, text: async () => "" };
+      }
+      const body = JSON.parse(options.body);
+      openRouterPrompt = body.messages[1].content;
+      return {
+        ok: true,
+        json: async () => ({
+          model: body.model,
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  summarySentence: "A recipe brief for a saved pasta reel.",
+                  takeaways: ["Capture ingredients and timing."],
+                  actions: ["Make a grocery list."],
+                  tags: ["recipe"]
+                })
+              }
+            }
+          ]
+        })
+      };
+    };
+
+    const response = createResponse();
+    await handler({
+      method: "POST",
+      headers: allowedHeaders(),
+      body: {
+        rawUrls: "https://www.instagram.com/reel/FOOD123/",
+        template: "recipe"
+      }
+    }, response);
+
+    assert.equal(response.statusCode, 200);
+    assert.match(openRouterPrompt, /Template: Recipe/);
+    assert.match(openRouterPrompt, /ingredients, measurements, steps, timing/);
+    assert.match(openRouterPrompt, /Tailor the takeaways and actions to the selected template/);
   });
 
   it("rejects OpenRouter responses that contain no usable summary content", async () => {

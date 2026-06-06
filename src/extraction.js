@@ -22,9 +22,77 @@ const STOP_WORDS = new Set([
   "your"
 ]);
 const DEFAULT_OPENROUTER_MODEL = "openai/gpt-oss-120b:free";
+const DEFAULT_TEMPLATE_ID = "general";
+const EXTRACTION_TEMPLATES = [
+  {
+    id: "general",
+    label: "General",
+    prompt: "Create concise research notes with source context, useful takeaways, and next actions.",
+    fallbackActions: ["Review the source before publishing or citing the summary."],
+    fallbackNote: "Capture claims, tools mentioned, open questions, and source context."
+  },
+  {
+    id: "recipe",
+    label: "Recipe",
+    prompt: "Extract ingredients, measurements, steps, timing, substitutions, and grocery-list actions.",
+    fallbackActions: ["List the ingredients, estimate measurements, and verify cook times from the source."],
+    fallbackNote: "Turn the Reel into ingredients, steps, substitutions, timing, and grocery items."
+  },
+  {
+    id: "travel",
+    label: "Travel",
+    prompt: "Extract places, itinerary ideas, costs, timing, booking hints, and map/search terms.",
+    fallbackActions: ["Save places, timing, costs, and map search terms before planning the trip."],
+    fallbackNote: "Convert the Reel into places, itinerary ideas, cost clues, and booking questions."
+  },
+  {
+    id: "workout",
+    label: "Workout",
+    prompt: "Extract exercises, sets, reps, duration, equipment, cautions, and progression ideas.",
+    fallbackActions: ["Record exercises, sets, reps, equipment, and safety cautions before trying it."],
+    fallbackNote: "Summarize exercises, sets, reps, rest, equipment, cautions, and progression."
+  },
+  {
+    id: "tutorial",
+    label: "Tutorial",
+    prompt: "Extract prerequisites, tools, ordered steps, pitfalls, decisions, and follow-up checks.",
+    fallbackActions: ["Convert the tutorial into ordered steps, required tools, and likely failure points."],
+    fallbackNote: "Turn the Reel into prerequisites, tools, steps, pitfalls, and follow-up checks."
+  },
+  {
+    id: "product",
+    label: "Product/ad analysis",
+    prompt: "Extract the offer, audience, hook, proof, CTA, objections, and claims that need verification.",
+    fallbackActions: ["Identify the offer, audience, proof, CTA, and claims that should be verified."],
+    fallbackNote: "Analyze hook, audience, pain, proof, objections, CTA, and claims to verify."
+  }
+];
 
 export function defaultOpenRouterModel() {
   return DEFAULT_OPENROUTER_MODEL;
+}
+
+export function extractionTemplates() {
+  return EXTRACTION_TEMPLATES.map((template) => ({ ...template }));
+}
+
+export function defaultExtractionTemplateId() {
+  return DEFAULT_TEMPLATE_ID;
+}
+
+export function normalizeExtractionTemplateId(value = DEFAULT_TEMPLATE_ID) {
+  const id = String(value || DEFAULT_TEMPLATE_ID).trim().toLowerCase();
+  return EXTRACTION_TEMPLATES.some((template) => template.id === id) ? id : DEFAULT_TEMPLATE_ID;
+}
+
+export function getExtractionTemplate(value = DEFAULT_TEMPLATE_ID) {
+  const id = normalizeExtractionTemplateId(value);
+  return EXTRACTION_TEMPLATES.find((template) => template.id === id) || EXTRACTION_TEMPLATES[0];
+}
+
+export function createTemplatePromptText(value = DEFAULT_TEMPLATE_ID) {
+  const template = getExtractionTemplate(value);
+  return `Template: ${template.label}\nTemplate guidance: ${template.prompt}`;
 }
 
 export function extractInstagramUrls(text = "") {
@@ -40,8 +108,10 @@ export function extractInstagramUrls(text = "") {
   }, []);
 }
 
-export function createClientExtraction({ rawUrls = "", role = "researcher", caption = "", transcript = "", visualText = "" } = {}) {
-  const baseSummary = summarizeInputs({ role, caption, transcript, visualText });
+export function createClientExtraction({ rawUrls = "", role = "researcher", caption = "", transcript = "", visualText = "", template = DEFAULT_TEMPLATE_ID } = {}) {
+  const templateId = normalizeExtractionTemplateId(template);
+  const generatedAt = new Date().toISOString();
+  const baseSummary = summarizeInputs({ role, caption, transcript, visualText, template: templateId });
   const tags = createTags([caption, transcript, visualText].join(" "));
 
   return {
@@ -55,7 +125,9 @@ export function createClientExtraction({ rawUrls = "", role = "researcher", capt
         role,
         summary: baseSummary,
         tags,
-        extraction: metadata
+        extraction: metadata,
+        template: templateId,
+        generatedAt
       });
     })
   };
@@ -162,7 +234,8 @@ export function classifyInstagramUrl(url) {
   return "unsupported";
 }
 
-export function summarizeInputs({ role = "researcher", caption = "", transcript = "", visualText = "" } = {}) {
+export function summarizeInputs({ role = "researcher", caption = "", transcript = "", visualText = "", template = DEFAULT_TEMPLATE_ID } = {}) {
+  const templateId = normalizeExtractionTemplateId(template);
   const captionSentences = splitSentences(caption);
   const transcriptSentences = splitSentences(transcript);
   const visualSentences = splitSentences(visualText);
@@ -172,19 +245,34 @@ export function summarizeInputs({ role = "researcher", caption = "", transcript 
     hook: chooseHook([...visualSentences, ...captionSentences, ...transcriptSentences]),
     takeaways: chooseTakeaways(allSentences),
     visualContext: visualSentences.slice(0, 3),
-    actions: chooseActions(allSentences),
-    creatorNotes: buildRoleNotes(role, allSentences)
+    actions: chooseActions(allSentences, templateId),
+    creatorNotes: buildRoleNotes(role, allSentences, templateId)
   };
 }
 
-export function buildMarkdown({ url, type, role, summary, tags, extraction, ai }) {
+export function buildMarkdown({ url, type, role, summary, tags, extraction, ai, template = DEFAULT_TEMPLATE_ID, generatedAt }) {
   const titleType = titleForType(type);
+  const templateInfo = getExtractionTemplate(template);
+  const title = createSummarySentence({ type, summary });
   return [
-    `# ${escapeMarkdownText(createSummarySentence({ type, summary }))}`,
+    formatFrontmatter({
+      title,
+      url,
+      type,
+      role,
+      tags,
+      extraction,
+      ai,
+      template: templateInfo.id,
+      generatedAt
+    }),
+    "",
+    `# ${escapeMarkdownText(title)}`,
     "",
     `- URL: ${escapeMarkdownText(url)}`,
     `- Type: ${escapeMarkdownText(titleType)}`,
     `- Role: ${escapeMarkdownText(role)}`,
+    `- Template: ${escapeMarkdownText(templateInfo.label)}`,
     `- Tags: ${escapeMarkdownText((tags || []).join(", ") || "untagged")}`,
     extraction?.ok ? `- Extracted Title: ${escapeMarkdownText(extraction.title || "Untitled")}` : "",
     extraction && !extraction.ok ? `- Extraction Status: ${escapeMarkdownText(extraction.error)}` : "",
@@ -207,7 +295,9 @@ export function buildMarkdown({ url, type, role, summary, tags, extraction, ai }
   ].filter((line) => line !== "").join("\n");
 }
 
-function buildItem({ url, type, role, summary, tags, extraction, ai }) {
+function buildItem({ url, type, role, summary, tags, extraction, ai, template = DEFAULT_TEMPLATE_ID, generatedAt }) {
+  const templateId = normalizeExtractionTemplateId(template);
+  const itemGeneratedAt = generatedAt || new Date().toISOString();
   return {
     url,
     type,
@@ -216,8 +306,10 @@ function buildItem({ url, type, role, summary, tags, extraction, ai }) {
     tags,
     extraction,
     ai,
+    template: templateId,
+    generatedAt: itemGeneratedAt,
     filename: createMarkdownFilename({ type, summary }),
-    markdown: buildMarkdown({ url, type, role, summary, tags, extraction, ai })
+    markdown: buildMarkdown({ url, type, role, summary, tags, extraction, ai, template: templateId, generatedAt: itemGeneratedAt })
   };
 }
 
@@ -273,12 +365,14 @@ function chooseTakeaways(sentences) {
   return (useful.length ? useful : sentences).slice(0, 5);
 }
 
-function chooseActions(sentences) {
+function chooseActions(sentences, template = DEFAULT_TEMPLATE_ID) {
+  const templateInfo = getExtractionTemplate(template);
   const actions = sentences.filter((sentence) => /save|try|use|export|add|paste|start|write|share/i.test(sentence));
-  return (actions.length ? actions : ["Review the source before publishing or citing the summary."]).slice(0, 4);
+  return (actions.length ? actions : templateInfo.fallbackActions).slice(0, 4);
 }
 
-function buildRoleNotes(role, sentences) {
+function buildRoleNotes(role, sentences, template = DEFAULT_TEMPLATE_ID) {
+  const templateInfo = getExtractionTemplate(template);
   const roleNotes = {
     creator: ["Identify the hook pattern, CTA, and reusable content structure."],
     marketer: ["Map this post to campaign angle, audience pain, proof, and CTA."],
@@ -287,8 +381,13 @@ function buildRoleNotes(role, sentences) {
     casual: ["Keep the TL;DR short and save only the useful next action."]
   };
   const notes = roleNotes[role] ?? roleNotes.researcher;
+  const templateNote = templateInfo.id === DEFAULT_TEMPLATE_ID ? "" : templateInfo.fallbackNote;
   const pattern = sentences.find((sentence) => /hook|CTA|step|pattern|template|framework/i.test(sentence));
-  return pattern ? [...notes, `Detected pattern: ${pattern}`] : notes;
+  return [
+    ...notes,
+    templateNote,
+    pattern ? `Detected pattern: ${pattern}` : ""
+  ].filter(Boolean);
 }
 
 function createTags(text) {
@@ -323,6 +422,30 @@ function normalizeList(value) {
 
 function formatList(items) {
   return items?.length ? items.map((item) => `- ${escapeMarkdownText(item)}`).join("\n") : "- Not provided.";
+}
+
+function formatFrontmatter({ title, url, type, role, tags = [], extraction = {}, ai = {}, template = DEFAULT_TEMPLATE_ID, generatedAt }) {
+  const cleanTags = normalizeList(tags).slice(0, 8);
+  return [
+    "---",
+    `title: ${yamlString(title || "Instagram summary")}`,
+    "source: \"instagram\"",
+    "platform: \"Instagram\"",
+    `type: ${yamlString(type || "reel")}`,
+    `url: ${yamlString(url || "")}`,
+    `shortcode: ${yamlString(extraction?.shortcode || "")}`,
+    `generatedAt: ${yamlString(generatedAt || new Date().toISOString())}`,
+    `template: ${yamlString(normalizeExtractionTemplateId(template))}`,
+    `role: ${yamlString(role || "researcher")}`,
+    "tags:",
+    ...(cleanTags.length ? cleanTags.map((tag) => `  - ${yamlString(tag)}`) : ["  - \"untagged\""]),
+    `aiModel: ${yamlString(ai?.model || "local-fallback")}`,
+    "---"
+  ].join("\n");
+}
+
+function yamlString(value = "") {
+  return JSON.stringify(escapeMarkdownText(value));
 }
 
 function escapeMarkdownText(value = "") {

@@ -1,4 +1,10 @@
-import { assertAiSummaryContent, defaultOpenRouterModel, extractInstagramUrls } from "../src/extraction.js";
+import {
+  assertAiSummaryContent,
+  createTemplatePromptText,
+  defaultOpenRouterModel,
+  extractInstagramUrls,
+  normalizeExtractionTemplateId
+} from "../src/extraction.js";
 
 const MAX_TEXT_LENGTH = 18000;
 const MAX_FIELD_LENGTH = 6000;
@@ -97,9 +103,11 @@ async function createPrompt(payload) {
   const transcript = normalizeText(payload.transcript);
   const visualText = normalizeText(payload.visualText);
   const role = normalizeText(payload.role || "researcher", 80);
+  const template = normalizeExtractionTemplateId(payload.template);
   const metadata = await fetchInstagramMetadata(urls);
   const source = [
     `Role: ${role}`,
+    createTemplatePromptText(template),
     `URLs:\n${urls}`,
     `Extracted Instagram metadata:\n${metadata}`,
     `Caption:\n${caption}`,
@@ -107,7 +115,7 @@ async function createPrompt(payload) {
     `Visual notes:\n${visualText}`
   ].join("\n\n").slice(0, MAX_TEXT_LENGTH);
 
-  return `${source}\n\nReturn JSON with keys summarySentence, takeaways, actions, and tags. summarySentence must be one short sentence suitable for a Markdown filename.`;
+  return `${source}\n\nReturn JSON with keys summarySentence, takeaways, actions, and tags. summarySentence must be one short sentence suitable for a Markdown filename. Tailor the takeaways and actions to the selected template.`;
 }
 
 function readPayload(request) {

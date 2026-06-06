@@ -1,0 +1,27 @@
+{
+  "name": "InstaBrief",
+  "short_name": "InstaBrief",
+  "description": "Turn Instagram links into organized Markdown summaries.",
+  "start_url": "/extract",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#09090d",
+  "theme_color": "#09090d",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "share_target": {
+    "action": "/extract",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

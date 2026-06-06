@@ -1,4 +1,26 @@
 {
+  "rewrites": [
+    {
+      "source": "/about",
+      "destination": "/"
+    },
+    {
+      "source": "/docs",
+      "destination": "/"
+    },
+    {
+      "source": "/templates",
+      "destination": "/"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/"
+    },
+    {
+      "source": "/extract",
+      "destination": "/"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
