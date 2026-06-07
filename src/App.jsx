@@ -15,33 +15,59 @@ import { pathForView, readSharedTextFromUrl, resolveViewFromUrl } from "./routin
 const themePresets = {
   focus: {
     name: "Focus",
+    slug: "focus",
     mode: "light",
     bg: "#f8fafc",
     panel: "#ffffff",
     text: "#0f172a",
     muted: "#475569",
     accent: "#2563eb",
-    soft: "#eef6ff"
+    soft: "#eef6ff",
+    cta: "#9a3412",
+    ctaHover: "#7c2d12",
+    ctaText: "#ffffff"
   },
   graphite: {
     name: "Graphite",
+    slug: "graphite",
     mode: "dark",
     bg: "#0f172a",
     panel: "#111827",
     text: "#f8fafc",
     muted: "#94a3b8",
     accent: "#60a5fa",
-    soft: "#1e293b"
+    soft: "#1e293b",
+    cta: "#9a3412",
+    ctaHover: "#7c2d12",
+    ctaText: "#ffffff"
   },
   copper: {
     name: "Copper",
+    slug: "copper",
     mode: "light",
     bg: "#fff7ed",
     panel: "#fffaf5",
     text: "#0f172a",
     muted: "#475569",
     accent: "#c2410c",
-    soft: "#ffedd5"
+    soft: "#ffedd5",
+    cta: "#9a3412",
+    ctaHover: "#7c2d12",
+    ctaText: "#ffffff"
+  },
+  collective: {
+    name: "Collective",
+    slug: "collective",
+    mode: "dark",
+    bg: "#000000",
+    panel: "#000000",
+    text: "#ffffff",
+    muted: "#5a5a5a",
+    accent: "#ffffff",
+    soft: "#0d0d0d",
+    cta: "#ffffff",
+    ctaHover: "#ffffff",
+    ctaText: "#000000"
   }
 };
 
@@ -50,7 +76,7 @@ const defaultThemeByMode = {
   dark: themePresets.graphite
 };
 
-const themeColorFields = ["bg", "panel", "text", "muted", "accent", "soft"];
+const themeColorFields = ["bg", "panel", "text", "muted", "accent", "soft", "cta", "ctaHover", "ctaText"];
 
 const initialForm = {
   rawUrls: "",
@@ -90,7 +116,10 @@ export default function App() {
     "--theme-accent": theme.accent,
     "--theme-soft": theme.soft,
     "--theme-accent-rgb": hexToRgb(theme.accent),
-    "--theme-color-scheme": theme.mode
+    "--theme-color-scheme": theme.mode,
+    "--cta": theme.cta,
+    "--cta-hover": theme.ctaHover,
+    "--cta-text": theme.ctaText
   }), [theme]);
 
   useEffect(() => {
@@ -221,7 +250,12 @@ export default function App() {
   }
 
   return (
-    <main className="app-shell min-h-screen px-4 py-4 text-app-text sm:px-6 sm:py-6" data-theme-mode={theme.mode} style={themeStyle}>
+    <main
+      className="app-shell min-h-screen px-4 py-4 text-app-text sm:px-6 sm:py-6"
+      data-theme-mode={theme.mode}
+      data-theme-name={theme.slug || "custom"}
+      style={themeStyle}
+    >
       <ThemeMenu
         isOpen={isThemeOpen}
         onModeChange={updateThemeMode}
@@ -654,7 +688,7 @@ function ThemeMenu({ isOpen, onModeChange, onThemeChange, onToggle, onValueChang
               </button>
             ))}
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-4 grid grid-cols-2 gap-2">
             {Object.entries(themePresets).map(([key, preset]) => (
               <button
                 className={theme.name === preset.name && theme.mode === preset.mode ? "theme-preset theme-preset-active" : "theme-preset"}
@@ -817,7 +851,8 @@ function normalizeTheme(savedTheme = {}) {
   const normalized = {
     ...fallback,
     ...savedTheme,
-    mode
+    mode,
+    slug: savedTheme.slug || fallback.slug
   };
 
   themeColorFields.forEach((field) => {

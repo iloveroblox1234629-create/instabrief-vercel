@@ -68,6 +68,17 @@ input[type="color"] {
   --theme-shadow: 0 22px 60px rgba(0, 0, 0, 0.34);
 }
 
+.app-shell[data-theme-name="collective"] {
+  --theme-border: #5a5a5a;
+  --theme-border-strong: #ffffff;
+  --theme-shadow: none;
+  background:
+    linear-gradient(rgba(90, 90, 90, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 90, 90, 0.22) 1px, transparent 1px),
+    #000000;
+  background-size: 54px 54px;
+}
+
 .tool-panel,
 .theme-menu {
   position: relative;
@@ -84,6 +95,40 @@ input[type="color"] {
 .app-shell[data-theme-mode="light"] .history-card,
 .app-shell[data-theme-mode="light"] .info-card {
   background: color-mix(in srgb, var(--theme-panel) 96%, var(--theme-bg));
+}
+
+.app-shell[data-theme-name="collective"] .tool-panel,
+.app-shell[data-theme-name="collective"] .theme-menu,
+.app-shell[data-theme-name="collective"] .workspace-header,
+.app-shell[data-theme-name="collective"] .history-card,
+.app-shell[data-theme-name="collective"] .info-card {
+  background: #000000;
+}
+
+.app-shell[data-theme-name="collective"] .tool-panel,
+.app-shell[data-theme-name="collective"] .theme-menu,
+.app-shell[data-theme-name="collective"] .workspace-header,
+.app-shell[data-theme-name="collective"] .workspace-header-aside span,
+.app-shell[data-theme-name="collective"] .panel-state-pill,
+.app-shell[data-theme-name="collective"] .field-summary,
+.app-shell[data-theme-name="collective"] .settings-band,
+.app-shell[data-theme-name="collective"] .details-panel,
+.app-shell[data-theme-name="collective"] .status-band,
+.app-shell[data-theme-name="collective"] .status-step,
+.app-shell[data-theme-name="collective"] .history-card,
+.app-shell[data-theme-name="collective"] .info-card,
+.app-shell[data-theme-name="collective"] .nav-links,
+.app-shell[data-theme-name="collective"] .nav-link,
+.app-shell[data-theme-name="collective"] .app-input,
+.app-shell[data-theme-name="collective"] .secondary-button,
+.app-shell[data-theme-name="collective"] .tiny-button,
+.app-shell[data-theme-name="collective"] .theme-trigger,
+.app-shell[data-theme-name="collective"] .theme-mode-button,
+.app-shell[data-theme-name="collective"] .theme-preset,
+.app-shell[data-theme-name="collective"] .theme-color-input,
+.app-shell[data-theme-name="collective"] .tag-row span,
+.app-shell[data-theme-name="collective"] .empty-history {
+  border-radius: 4.5px;
 }
 
 .tool-panel {
@@ -130,6 +175,14 @@ input[type="color"] {
   text-transform: uppercase;
 }
 
+.app-shell[data-theme-name="collective"] .eyebrow,
+.app-shell[data-theme-name="collective"] .brand-subtitle,
+.app-shell[data-theme-name="collective"] .status-copy,
+.app-shell[data-theme-name="collective"] .status-step,
+.app-shell[data-theme-name="collective"] .theme-preset small {
+  color: #5a5a5a;
+}
+
 .tool-panel-header {
   display: flex;
   gap: 1rem;
@@ -150,6 +203,14 @@ input[type="color"] {
   padding: 0.4rem 0.75rem;
   font-size: 0.72rem;
   font-weight: 950;
+}
+
+.app-shell[data-theme-name="collective"] .panel-state-pill,
+.app-shell[data-theme-name="collective"] .status-step-active,
+.app-shell[data-theme-name="collective"] .tag-row span {
+  border-color: #ffffff;
+  background: #000000;
+  color: #ffffff;
 }
 
 .form-grid {
@@ -188,6 +249,14 @@ input[type="color"] {
   color: var(--theme-muted);
   font-size: 0.82rem;
   font-weight: 750;
+}
+
+.app-shell[data-theme-name="collective"] .field-summary,
+.app-shell[data-theme-name="collective"] .settings-band,
+.app-shell[data-theme-name="collective"] .details-panel,
+.app-shell[data-theme-name="collective"] .status-band,
+.app-shell[data-theme-name="collective"] .workspace-header-aside span {
+  background: #000000;
 }
 
 .field-summary strong {
@@ -343,6 +412,13 @@ input[type="color"] {
   color: var(--theme-accent);
 }
 
+.app-shell[data-theme-name="collective"] .nav-link:hover,
+.app-shell[data-theme-name="collective"] .nav-link-active {
+  border-color: #ffffff;
+  background: #000000;
+  color: #ffffff;
+}
+
 .app-input {
   width: 100%;
   min-height: 3rem;
@@ -356,6 +432,13 @@ input[type="color"] {
     border-color 0.2s ease,
     box-shadow 0.2s ease,
     background-color 0.2s ease;
+}
+
+.app-shell[data-theme-name="collective"] .app-input {
+  background: #000000;
+  border-color: #5a5a5a;
+  color: #ffffff;
+  font-weight: 400;
 }
 
 .app-input::placeholder {
@@ -403,6 +486,16 @@ select.app-input {
     transform 0.2s ease;
 }
 
+.app-shell[data-theme-name="collective"] .primary-button {
+  box-shadow: none;
+  font-weight: 400;
+}
+
+.app-shell[data-theme-name="collective"] .primary-button:hover {
+  border-color: #ffffff;
+  box-shadow: none;
+}
+
 .primary-button:hover {
   background: var(--cta-hover);
   box-shadow: 0 16px 32px rgba(249, 115, 22, 0.28);
@@ -443,6 +536,27 @@ select.app-input {
   color: var(--theme-accent);
 }
 
+.app-shell[data-theme-name="collective"] .secondary-button,
+.app-shell[data-theme-name="collective"] .tiny-button,
+.app-shell[data-theme-name="collective"] .theme-mode-button,
+.app-shell[data-theme-name="collective"] .theme-preset {
+  background: #000000;
+  color: #5a5a5a;
+  font-weight: 400;
+}
+
+.app-shell[data-theme-name="collective"] .secondary-button:hover,
+.app-shell[data-theme-name="collective"] .secondary-button-accent,
+.app-shell[data-theme-name="collective"] .tiny-button:hover,
+.app-shell[data-theme-name="collective"] .theme-mode-button:hover,
+.app-shell[data-theme-name="collective"] .theme-mode-button-active,
+.app-shell[data-theme-name="collective"] .theme-preset-active,
+.app-shell[data-theme-name="collective"] .theme-preset:hover {
+  border-color: #ffffff;
+  background: #000000;
+  color: #ffffff;
+}
+
 .secondary-button:hover {
   background: rgba(var(--theme-accent-rgb), 0.09);
 }
@@ -467,6 +581,11 @@ select.app-input {
   border-radius: 999px;
   background: var(--theme-accent);
   box-shadow: 0 0 0 0.35rem rgba(var(--theme-accent-rgb), 0.13);
+}
+
+.app-shell[data-theme-name="collective"] .status-dot {
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #5a5a5a;
 }
 
 .status-dot-busy {
@@ -634,6 +753,11 @@ select.app-input {
   background: color-mix(in srgb, var(--theme-panel) 92%, transparent);
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
   cursor: pointer;
+}
+
+.app-shell[data-theme-name="collective"] .theme-trigger {
+  background: #000000;
+  box-shadow: none;
 }
 
 .theme-trigger-dot {
