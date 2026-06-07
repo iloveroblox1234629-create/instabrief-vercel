@@ -79,6 +79,13 @@ input[type="color"] {
   background-size: 54px 54px;
 }
 
+.app-shell[data-theme-name="engineering"] {
+  --theme-border: #e5e5e5;
+  --theme-border-strong: #000000;
+  --theme-shadow: none;
+  background: #f6f8f7;
+}
+
 .tool-panel,
 .theme-menu {
   position: relative;
@@ -105,6 +112,14 @@ input[type="color"] {
   background: #000000;
 }
 
+.app-shell[data-theme-name="engineering"] .tool-panel,
+.app-shell[data-theme-name="engineering"] .theme-menu,
+.app-shell[data-theme-name="engineering"] .workspace-header,
+.app-shell[data-theme-name="engineering"] .history-card,
+.app-shell[data-theme-name="engineering"] .info-card {
+  background: #f6f8f7;
+}
+
 .app-shell[data-theme-name="collective"] .tool-panel,
 .app-shell[data-theme-name="collective"] .theme-menu,
 .app-shell[data-theme-name="collective"] .workspace-header,
@@ -129,6 +144,41 @@ input[type="color"] {
 .app-shell[data-theme-name="collective"] .tag-row span,
 .app-shell[data-theme-name="collective"] .empty-history {
   border-radius: 4.5px;
+}
+
+.app-shell[data-theme-name="engineering"] .tool-panel,
+.app-shell[data-theme-name="engineering"] .theme-menu,
+.app-shell[data-theme-name="engineering"] .workspace-header,
+.app-shell[data-theme-name="engineering"] .workspace-header-aside span,
+.app-shell[data-theme-name="engineering"] .panel-state-pill,
+.app-shell[data-theme-name="engineering"] .field-summary,
+.app-shell[data-theme-name="engineering"] .settings-band,
+.app-shell[data-theme-name="engineering"] .details-panel,
+.app-shell[data-theme-name="engineering"] .status-band,
+.app-shell[data-theme-name="engineering"] .status-step,
+.app-shell[data-theme-name="engineering"] .history-card,
+.app-shell[data-theme-name="engineering"] .info-card,
+.app-shell[data-theme-name="engineering"] .nav-links,
+.app-shell[data-theme-name="engineering"] .nav-link,
+.app-shell[data-theme-name="engineering"] .app-input,
+.app-shell[data-theme-name="engineering"] .secondary-button,
+.app-shell[data-theme-name="engineering"] .tiny-button,
+.app-shell[data-theme-name="engineering"] .theme-trigger,
+.app-shell[data-theme-name="engineering"] .theme-mode-button,
+.app-shell[data-theme-name="engineering"] .theme-preset,
+.app-shell[data-theme-name="engineering"] .theme-color-input,
+.app-shell[data-theme-name="engineering"] .tag-row span,
+.app-shell[data-theme-name="engineering"] .empty-history {
+  border-radius: 0;
+}
+
+.app-shell[data-theme-name="engineering"] .tool-panel,
+.app-shell[data-theme-name="engineering"] .theme-menu,
+.app-shell[data-theme-name="engineering"] .workspace-header,
+.app-shell[data-theme-name="engineering"] .history-card,
+.app-shell[data-theme-name="engineering"] .info-card,
+.app-shell[data-theme-name="engineering"] .nav-links {
+  box-shadow: none;
 }
 
 .tool-panel {
@@ -183,6 +233,39 @@ input[type="color"] {
   color: #5a5a5a;
 }
 
+.app-shell[data-theme-name="engineering"] {
+  font-weight: 100;
+}
+
+.app-shell[data-theme-name="engineering"] h1,
+.app-shell[data-theme-name="engineering"] h2,
+.app-shell[data-theme-name="engineering"] h3,
+.app-shell[data-theme-name="engineering"] .brand-link,
+.app-shell[data-theme-name="engineering"] .field-label,
+.app-shell[data-theme-name="engineering"] .details-summary,
+.app-shell[data-theme-name="engineering"] .primary-button,
+.app-shell[data-theme-name="engineering"] .secondary-button,
+.app-shell[data-theme-name="engineering"] .tiny-button,
+.app-shell[data-theme-name="engineering"] .theme-mode-button,
+.app-shell[data-theme-name="engineering"] .theme-preset {
+  font-weight: 300;
+}
+
+.app-shell[data-theme-name="engineering"] .eyebrow,
+.app-shell[data-theme-name="engineering"] .brand-subtitle,
+.app-shell[data-theme-name="engineering"] .status-copy,
+.app-shell[data-theme-name="engineering"] .status-step,
+.app-shell[data-theme-name="engineering"] .theme-preset small {
+  color: #5a5a5a;
+  font-weight: 100;
+}
+
+.app-shell[data-theme-name="engineering"] h1 {
+  max-width: 24ch;
+  font-size: clamp(2rem, 5vw, 2.5rem);
+  line-height: 1.11;
+}
+
 .tool-panel-header {
   display: flex;
   gap: 1rem;
@@ -211,6 +294,14 @@ input[type="color"] {
   border-color: #ffffff;
   background: #000000;
   color: #ffffff;
+}
+
+.app-shell[data-theme-name="engineering"] .panel-state-pill,
+.app-shell[data-theme-name="engineering"] .status-step-active,
+.app-shell[data-theme-name="engineering"] .tag-row span {
+  border-color: #000000;
+  background: #f6f8f7;
+  color: #000000;
 }
 
 .form-grid {
@@ -257,6 +348,19 @@ input[type="color"] {
 .app-shell[data-theme-name="collective"] .status-band,
 .app-shell[data-theme-name="collective"] .workspace-header-aside span {
   background: #000000;
+}
+
+.app-shell[data-theme-name="engineering"] .field-summary,
+.app-shell[data-theme-name="engineering"] .settings-band,
+.app-shell[data-theme-name="engineering"] .details-panel,
+.app-shell[data-theme-name="engineering"] .status-band,
+.app-shell[data-theme-name="engineering"] .workspace-header-aside span,
+.app-shell[data-theme-name="engineering"] .secondary-button,
+.app-shell[data-theme-name="engineering"] .tiny-button,
+.app-shell[data-theme-name="engineering"] .theme-mode-button,
+.app-shell[data-theme-name="engineering"] .theme-preset,
+.app-shell[data-theme-name="engineering"] .empty-history {
+  background: #f6f8f7;
 }
 
 .field-summary strong {
@@ -419,6 +523,20 @@ input[type="color"] {
   color: #ffffff;
 }
 
+.app-shell[data-theme-name="engineering"] .nav-links {
+  border-top-color: #e5e5e5;
+  border-right-color: transparent;
+  border-bottom-color: #e5e5e5;
+  border-left-color: transparent;
+}
+
+.app-shell[data-theme-name="engineering"] .nav-link:hover,
+.app-shell[data-theme-name="engineering"] .nav-link-active {
+  border-color: #000000;
+  background: #f6f8f7;
+  color: #000000;
+}
+
 .app-input {
   width: 100%;
   min-height: 3rem;
@@ -439,6 +557,16 @@ input[type="color"] {
   border-color: #5a5a5a;
   color: #ffffff;
   font-weight: 400;
+}
+
+.app-shell[data-theme-name="engineering"] .app-input {
+  background: #f6f8f7;
+  border-color: #e5e5e5;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-left-color: transparent;
+  color: #000000;
+  font-weight: 100;
 }
 
 .app-input::placeholder {
@@ -493,6 +621,16 @@ select.app-input {
 
 .app-shell[data-theme-name="collective"] .primary-button:hover {
   border-color: #ffffff;
+  box-shadow: none;
+}
+
+.app-shell[data-theme-name="engineering"] .primary-button {
+  border-color: #000000;
+  box-shadow: none;
+}
+
+.app-shell[data-theme-name="engineering"] .primary-button:hover {
+  border-color: #0f0e12;
   box-shadow: none;
 }
 
@@ -557,6 +695,25 @@ select.app-input {
   color: #ffffff;
 }
 
+.app-shell[data-theme-name="engineering"] .secondary-button,
+.app-shell[data-theme-name="engineering"] .tiny-button,
+.app-shell[data-theme-name="engineering"] .theme-mode-button,
+.app-shell[data-theme-name="engineering"] .theme-preset {
+  color: #000000;
+}
+
+.app-shell[data-theme-name="engineering"] .secondary-button:hover,
+.app-shell[data-theme-name="engineering"] .secondary-button-accent,
+.app-shell[data-theme-name="engineering"] .tiny-button:hover,
+.app-shell[data-theme-name="engineering"] .theme-mode-button:hover,
+.app-shell[data-theme-name="engineering"] .theme-mode-button-active,
+.app-shell[data-theme-name="engineering"] .theme-preset-active,
+.app-shell[data-theme-name="engineering"] .theme-preset:hover {
+  border-color: #000000;
+  background: #ffffff;
+  color: #000000;
+}
+
 .secondary-button:hover {
   background: rgba(var(--theme-accent-rgb), 0.09);
 }
@@ -586,6 +743,11 @@ select.app-input {
 .app-shell[data-theme-name="collective"] .status-dot {
   background: #ffffff;
   box-shadow: 0 0 0 1px #5a5a5a;
+}
+
+.app-shell[data-theme-name="engineering"] .status-dot {
+  background: #000000;
+  box-shadow: 0 0 0 1px #000000;
 }
 
 .status-dot-busy {
@@ -758,6 +920,19 @@ select.app-input {
 .app-shell[data-theme-name="collective"] .theme-trigger {
   background: #000000;
   box-shadow: none;
+}
+
+.app-shell[data-theme-name="engineering"] .theme-trigger {
+  background: #f6f8f7;
+  box-shadow: none;
+}
+
+.app-shell[data-theme-name="engineering"] .workspace-header {
+  border-top-color: #000000;
+}
+
+.app-shell[data-theme-name="engineering"] .history-panel {
+  border-top-color: #0f0e12;
 }
 
 .theme-trigger-dot {

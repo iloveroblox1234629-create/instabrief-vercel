@@ -55,6 +55,20 @@ const themePresets = {
     ctaHover: "#7c2d12",
     ctaText: "#ffffff"
   },
+  engineering: {
+    name: "Engineering",
+    slug: "engineering",
+    mode: "light",
+    bg: "#f6f8f7",
+    panel: "#f6f8f7",
+    text: "#000000",
+    muted: "#5a5a5a",
+    accent: "#000000",
+    soft: "#ffffff",
+    cta: "#000000",
+    ctaHover: "#0f0e12",
+    ctaText: "#f6f8f7"
+  },
   collective: {
     name: "Collective",
     slug: "collective",
