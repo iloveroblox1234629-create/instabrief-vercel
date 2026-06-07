@@ -13,34 +13,44 @@ import {
 import { pathForView, readSharedTextFromUrl, resolveViewFromUrl } from "./routing.js";
 
 const themePresets = {
-  axolotl: {
-    name: "Axolotl",
-    bg: "#09090d",
-    panel: "#1e1e26",
-    text: "#fcfaff",
-    muted: "#b8b3c4",
-    accent: "#ff87be",
-    soft: "#121218"
+  focus: {
+    name: "Focus",
+    mode: "light",
+    bg: "#f8fafc",
+    panel: "#ffffff",
+    text: "#0f172a",
+    muted: "#475569",
+    accent: "#2563eb",
+    soft: "#eef6ff"
   },
-  nebula: {
-    name: "Nebula",
-    bg: "#0b0911",
-    panel: "#1c1826",
-    text: "#fcfaff",
-    muted: "#c3b9d6",
-    accent: "#b988ff",
-    soft: "#181222"
+  graphite: {
+    name: "Graphite",
+    mode: "dark",
+    bg: "#0f172a",
+    panel: "#111827",
+    text: "#f8fafc",
+    muted: "#94a3b8",
+    accent: "#60a5fa",
+    soft: "#1e293b"
   },
-  cyan: {
-    name: "Cyan",
-    bg: "#061013",
-    panel: "#121e23",
-    text: "#f7feff",
-    muted: "#aac4ca",
-    accent: "#40e0d0",
-    soft: "#0c1f24"
+  copper: {
+    name: "Copper",
+    mode: "light",
+    bg: "#fff7ed",
+    panel: "#fffaf5",
+    text: "#0f172a",
+    muted: "#475569",
+    accent: "#c2410c",
+    soft: "#ffedd5"
   }
 };
+
+const defaultThemeByMode = {
+  light: themePresets.focus,
+  dark: themePresets.graphite
+};
+
+const themeColorFields = ["bg", "panel", "text", "muted", "accent", "soft"];
 
 const initialForm = {
   rawUrls: "",
@@ -79,12 +89,20 @@ export default function App() {
     "--theme-muted": theme.muted,
     "--theme-accent": theme.accent,
     "--theme-soft": theme.soft,
-    "--theme-accent-rgb": hexToRgb(theme.accent)
+    "--theme-accent-rgb": hexToRgb(theme.accent),
+    "--theme-color-scheme": theme.mode
   }), [theme]);
 
   useEffect(() => {
     localStorage.setItem("instabrief-theme", JSON.stringify(theme));
   }, [theme]);
+
+  useEffect(() => {
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) {
+      themeColor.setAttribute("content", theme.bg);
+    }
+  }, [theme.bg]);
 
   useEffect(() => {
     const handlePopState = () => setView(resolveViewFromUrl(window.location.href));
@@ -140,6 +158,10 @@ export default function App() {
 
   function updateTheme(name, value) {
     setTheme((current) => ({ ...current, [name]: value }));
+  }
+
+  function updateThemeMode(mode) {
+    setTheme(normalizeTheme(defaultThemeByMode[mode]));
   }
 
   function navigate(nextView) {
@@ -199,16 +221,17 @@ export default function App() {
   }
 
   return (
-    <main className="app-shell min-h-screen px-4 py-6 text-app-text" style={themeStyle}>
+    <main className="app-shell min-h-screen px-4 py-4 text-app-text sm:px-6 sm:py-6" data-theme-mode={theme.mode} style={themeStyle}>
       <ThemeMenu
         isOpen={isThemeOpen}
+        onModeChange={updateThemeMode}
         onToggle={() => setIsThemeOpen((open) => !open)}
-        onThemeChange={setTheme}
+        onThemeChange={(preset) => setTheme(normalizeTheme(preset))}
         onValueChange={updateTheme}
         theme={theme}
       />
 
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="mx-auto w-full max-w-7xl">
         <SiteNav currentView={view} onNavigate={navigate} />
         {view === "extract" ? (
           <ExtractorView
@@ -243,10 +266,13 @@ function SiteNav({ currentView, onNavigate }) {
     ["privacy", "Privacy"]
   ];
   return (
-    <nav className="site-nav mx-auto mb-6 flex max-w-5xl flex-wrap items-center justify-between gap-4">
+    <nav className="site-nav mx-auto mb-5 flex w-full items-center justify-between gap-4">
       <button className="brand-link" type="button" onClick={() => onNavigate("extract")}>
         <span className="brand-mark brand-mark-small" aria-hidden="true" />
-        <span>InstaBrief</span>
+        <span className="grid text-left leading-tight">
+          <span>InstaBrief</span>
+          <span className="brand-subtitle">Extraction workspace</span>
+        </span>
       </button>
       <div className="nav-links">
         {links.map(([view, label]) => (
@@ -254,6 +280,7 @@ function SiteNav({ currentView, onNavigate }) {
             className={currentView === view ? "nav-link nav-link-active" : "nav-link"}
             key={view}
             type="button"
+            aria-current={currentView === view ? "page" : undefined}
             onClick={() => onNavigate(view)}
           >
             {label}
@@ -279,51 +306,67 @@ function ExtractorView({
   pendingFallback,
   status
 }) {
+  const selectedTemplate = getExtractionTemplate(form.template);
+
   return (
-    <section className="mx-auto grid min-h-[calc(100vh-120px)] w-full max-w-5xl items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-      <div className="flex min-h-[34rem] flex-col justify-center">
-        <header className="mb-7">
-          <div className="mb-2 flex items-center gap-3">
-            <span className="brand-mark" aria-hidden="true" />
-            <h1 className="text-gradient text-4xl font-black tracking-tight sm:text-6xl">InstaBrief</h1>
+    <section className="extractor-workspace mx-auto grid w-full items-start gap-5 xl:grid-cols-[minmax(0,1fr)_23rem]">
+      <div className="grid gap-5">
+        <header className="workspace-header">
+          <div>
+            <p className="eyebrow">Instagram to Markdown</p>
+            <h1 className="mt-2 text-3xl font-black text-app-text sm:text-4xl">Extract a reusable brief from saved media.</h1>
           </div>
-          <p className="max-w-2xl text-lg font-semibold text-app-muted">Turn Instagram links into organized Markdown.</p>
+          <div className="workspace-header-aside" aria-label="Workflow">
+            <span>Link</span>
+            <span>Template</span>
+            <span>Markdown</span>
+          </div>
         </header>
 
-        <form className="glass-panel w-full overflow-hidden rounded-[2rem] p-5 shadow-2xl sm:p-8" onSubmit={onSubmit}>
-          <div className="panel-accent" />
-          <div>
-            <h2 className="text-2xl font-black tracking-tight text-app-text">Download a Markdown summary</h2>
-            <p className="mt-2 text-sm font-semibold leading-6 text-app-muted">Paste one Reel link and get a one-file download.</p>
+        <form className="tool-panel" onSubmit={onSubmit}>
+          <div className="tool-panel-header">
+            <div>
+              <h2 className="text-2xl font-black text-app-text">New extraction</h2>
+              <p className="mt-1 text-sm font-semibold leading-6 text-app-muted">Paste one Instagram Reel or post URL, choose a brief style, and download a Markdown file.</p>
+            </div>
+            <span className="panel-state-pill">{form.useServerSummary ? "Server AI" : "Browser AI"}</span>
           </div>
 
-          <label className="mt-7 grid gap-2 text-sm font-black text-app-text">
-            Instagram link
-            <input
-              className="app-input focus-glow"
-              placeholder="https://www.instagram.com/reel/..."
-              value={form.rawUrls}
-              onChange={(event) => onUpdateField("rawUrls", event.target.value)}
-            />
-          </label>
-
-          <label className="mt-4 grid gap-2 text-sm font-black text-app-text">
-            Template
-            <select
-              className="app-input focus-glow"
-              value={form.template}
-              onChange={(event) => onUpdateField("template", event.target.value)}
-            >
-              {templates.map((template) => (
-                <option key={template.id} value={template.id}>{template.label}</option>
-              ))}
-            </select>
-          </label>
-
-          <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-app-soft p-4">
-            <label className="flex items-start gap-3 text-sm font-black text-app-text">
+          <div className="form-grid mt-6">
+            <label className="field field-wide">
+              <span className="field-label">Instagram link</span>
               <input
-                className="mt-0.5 h-5 w-5 accent-[var(--theme-accent)]"
+                className="app-input focus-glow"
+                placeholder="https://www.instagram.com/reel/..."
+                value={form.rawUrls}
+                onChange={(event) => onUpdateField("rawUrls", event.target.value)}
+              />
+            </label>
+
+            <label className="field">
+              <span className="field-label">Template</span>
+              <select
+                className="app-input focus-glow"
+                value={form.template}
+                onChange={(event) => onUpdateField("template", event.target.value)}
+              >
+                {templates.map((template) => (
+                  <option key={template.id} value={template.id}>{template.label}</option>
+                ))}
+              </select>
+            </label>
+
+            <div className="field-summary">
+              <span className="field-label">Output profile</span>
+              <strong>{selectedTemplate.label}</strong>
+              <span>{form.role === "casual" ? "Quick read" : `${form.role.charAt(0).toUpperCase()}${form.role.slice(1)} workflow`}</span>
+            </div>
+          </div>
+
+          <section className="settings-band mt-5" aria-label="Summary settings">
+            <label className="summary-toggle text-sm font-black text-app-text">
+              <input
+                className="h-5 w-5 accent-[var(--theme-accent)]"
                 type="checkbox"
                 checked={form.useServerSummary}
                 onChange={(event) => onUpdateField("useServerSummary", event.target.checked)}
@@ -335,9 +378,9 @@ function ExtractorView({
             </label>
 
             {!form.useServerSummary ? (
-              <div className="mt-3 grid gap-3">
-                <label className="grid gap-2 text-sm font-black text-app-text">
-                  Client OpenRouter API key
+              <div className="client-key-grid mt-4">
+                <label className="field">
+                  <span className="field-label">Client OpenRouter API key</span>
                   <input
                     className="app-input focus-glow"
                     placeholder="sk-or-..."
@@ -346,24 +389,24 @@ function ExtractorView({
                     onChange={(event) => onUpdateField("clientApiKey", event.target.value)}
                   />
                 </label>
-                <label className="grid gap-2 text-sm font-black text-app-text">
-                  Model
+                <label className="field">
+                  <span className="field-label">Model</span>
                   <input
                     className="app-input focus-glow"
                     value={form.clientModel}
                     onChange={(event) => onUpdateField("clientModel", event.target.value)}
                   />
                 </label>
-                <p className="text-xs font-bold leading-5 text-app-muted">The key stays in this tab and is sent directly from your browser to OpenRouter.</p>
+                <p className="client-key-note text-xs font-bold leading-5 text-app-muted">The key stays in this tab and is sent directly from your browser to OpenRouter.</p>
               </div>
             ) : null}
-          </div>
+          </section>
 
-          <details className="mt-4 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4">
-            <summary className="cursor-pointer text-sm font-black text-app-text">Optional context</summary>
+          <details className="details-panel mt-5">
+            <summary className="details-summary">Optional context</summary>
             <div className="mt-4 grid gap-4">
-              <label className="grid gap-2 text-sm font-black text-app-text">
-                Role
+              <label className="field">
+                <span className="field-label">Role</span>
                 <select
                   className="app-input focus-glow"
                   value={form.role}
@@ -382,9 +425,9 @@ function ExtractorView({
             </div>
           </details>
 
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="action-row mt-5">
             <button
-              className="gradient-primary glow-hover min-h-14 flex-1 rounded-2xl px-5 py-4 text-base font-black text-[#520031] shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+              className="primary-button"
               disabled={isWorking}
               type="submit"
             >
@@ -418,7 +461,13 @@ function ExtractorView({
               </button>
             ) : null}
           </div>
-          <p className="mt-3 min-h-6 text-sm font-bold text-app-muted" role="status">{status}</p>
+
+          <StatusBand
+            isWorking={isWorking}
+            latestFile={latestFile}
+            pendingFallback={pendingFallback}
+            status={status}
+          />
         </form>
       </div>
 
@@ -435,8 +484,8 @@ function ExtractorView({
 
 function TextAreaField({ label, minHeight = "min-h-20", value, onChange }) {
   return (
-    <label className="grid gap-2 text-sm font-black text-app-text">
-      {label}
+    <label className="field">
+      <span className="field-label">{label}</span>
       <textarea
         className={`app-input ${minHeight} focus-glow`}
         value={value}
@@ -446,12 +495,35 @@ function TextAreaField({ label, minHeight = "min-h-20", value, onChange }) {
   );
 }
 
+function StatusBand({ isWorking, latestFile, pendingFallback, status }) {
+  const steps = [
+    ["Ready", Boolean(status)],
+    ["Summarize", isWorking || Boolean(latestFile) || Boolean(pendingFallback)],
+    ["Save", Boolean(latestFile)]
+  ];
+
+  return (
+    <section className="status-band mt-5" aria-label="Extraction status">
+      <div>
+        <span className={isWorking ? "status-dot status-dot-busy" : "status-dot"} aria-hidden="true" />
+        <p className="status-copy" role="status">{status}</p>
+      </div>
+      <ol className="status-steps" aria-label="Progress">
+        {steps.map(([label, active]) => (
+          <li className={active ? "status-step status-step-active" : "status-step"} key={label}>{label}</li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 function HistoryPanel({ history, onClear, onCopy, onDelete, onDownload }) {
   return (
-    <aside className="glass-panel history-panel rounded-[2rem] p-5 shadow-2xl sm:p-6">
-      <div className="flex items-center justify-between gap-3">
+    <aside className="history-panel tool-panel">
+      <div className="history-panel-heading">
         <div>
-          <h2 className="text-xl font-black text-app-text">Recent Markdown</h2>
+          <p className="eyebrow">Local library</p>
+          <h2 className="mt-1 text-xl font-black text-app-text">Recent Markdown</h2>
           <p className="mt-1 text-xs font-bold text-app-muted">Stored in this browser.</p>
         </div>
         {history.length ? (
@@ -461,17 +533,26 @@ function HistoryPanel({ history, onClear, onCopy, onDelete, onDownload }) {
       <div className="mt-5 grid gap-3">
         {history.length ? history.map((item) => (
           <article className="history-card" key={item.id}>
-            <h3 className="line-clamp-2 text-sm font-black text-app-text">{item.title}</h3>
-            <p className="mt-1 truncate text-xs font-bold text-app-muted">{item.filename}</p>
-            <p className="mt-2 text-xs font-bold text-app-muted">{formatHistoryDate(item.createdAt)} · {getExtractionTemplate(item.template).label}</p>
-            <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="history-card-main">
+              <h3 className="line-clamp-2 text-sm font-black text-app-text">{item.title}</h3>
+              <p className="mt-1 truncate text-xs font-bold text-app-muted">{item.filename}</p>
+              <p className="mt-2 text-xs font-bold text-app-muted">{formatHistoryDate(item.createdAt)} · {getExtractionTemplate(item.template).label}</p>
+            </div>
+            {item.tags?.length ? (
+              <div className="tag-row" aria-label="Tags">
+                {item.tags.slice(0, 3).map((tag) => (
+                  <span key={tag}>{tag}</span>
+                ))}
+              </div>
+            ) : null}
+            <div className="history-actions">
               <button className="tiny-button" type="button" onClick={() => onCopy(item)}>Copy</button>
               <button className="tiny-button" type="button" onClick={() => onDownload(item)}>Download</button>
               <button className="tiny-button danger-button" type="button" onClick={() => onDelete(item.id)}>Delete</button>
             </div>
           </article>
         )) : (
-          <p className="rounded-2xl border border-dashed border-white/10 p-4 text-sm font-bold leading-6 text-app-muted">Generated files will appear here with copy, download, and delete controls.</p>
+          <p className="empty-history text-sm font-bold leading-6 text-app-muted">Generated files will appear here with copy, download, and delete controls.</p>
         )}
       </div>
     </aside>
@@ -518,13 +599,13 @@ function InfoPage({ view, onNavigate }) {
   const page = pages[view] || pages.about;
 
   return (
-    <section className="mx-auto max-w-5xl py-8 sm:py-14">
-      <div className="max-w-3xl">
-        <p className="text-sm font-black uppercase tracking-[0.18em] text-app-accent">InstaBrief</p>
-        <h1 className="mt-3 text-4xl font-black tracking-tight text-app-text sm:text-6xl">{page.title}</h1>
+    <section className="info-page mx-auto py-8 sm:py-12">
+      <div className="info-page-header">
+        <p className="eyebrow">InstaBrief</p>
+        <h1 className="mt-3 text-3xl font-black text-app-text sm:text-5xl">{page.title}</h1>
         <p className="mt-5 text-lg font-semibold leading-8 text-app-muted">{page.intro}</p>
       </div>
-      <div className="mt-10 grid gap-4 md:grid-cols-2">
+      <div className="info-grid mt-8">
         {page.sections.map(([title, body]) => (
           <article className="info-card" key={title}>
             <h2 className="text-xl font-black text-app-text">{title}</h2>
@@ -532,14 +613,19 @@ function InfoPage({ view, onNavigate }) {
           </article>
         ))}
       </div>
-      <button className="gradient-primary glow-hover mt-8 rounded-2xl px-5 py-4 text-sm font-black text-[#520031]" type="button" onClick={() => onNavigate("extract")}>
+      <button className="primary-button mt-8 w-full sm:w-auto" type="button" onClick={() => onNavigate("extract")}>
         Open extractor
       </button>
     </section>
   );
 }
 
-function ThemeMenu({ isOpen, onThemeChange, onToggle, onValueChange, theme }) {
+function ThemeMenu({ isOpen, onModeChange, onThemeChange, onToggle, onValueChange, theme }) {
+  const modeOptions = [
+    ["light", "Light"],
+    ["dark", "Dark"]
+  ];
+
   return (
     <div className="fixed right-4 top-4 z-20">
       <button
@@ -553,17 +639,31 @@ function ThemeMenu({ isOpen, onThemeChange, onToggle, onValueChange, theme }) {
         <span className="theme-trigger-dot" />
       </button>
       {isOpen ? (
-        <section className="glass-panel absolute right-0 mt-3 w-[17rem] rounded-[1.75rem] p-5 shadow-2xl sm:w-72">
+        <section className="theme-menu absolute right-0 mt-3 w-[17rem] p-5 shadow-2xl sm:w-72">
           <h2 className="text-lg font-black text-app-text">Theme</h2>
+          <div className="theme-mode-switch mt-4 grid grid-cols-2 gap-2" aria-label="Color mode">
+            {modeOptions.map(([mode, label]) => (
+              <button
+                aria-pressed={theme.mode === mode}
+                className={theme.mode === mode ? "theme-mode-button theme-mode-button-active" : "theme-mode-button"}
+                key={mode}
+                type="button"
+                onClick={() => onModeChange(mode)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <div className="mt-4 grid grid-cols-3 gap-2">
             {Object.entries(themePresets).map(([key, preset]) => (
               <button
-                className="rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-3 text-xs font-black text-app-text transition hover:border-app-accent hover:bg-white/[0.08]"
+                className={theme.name === preset.name && theme.mode === preset.mode ? "theme-preset theme-preset-active" : "theme-preset"}
                 key={key}
                 type="button"
                 onClick={() => onThemeChange(preset)}
               >
-                {preset.name}
+                <span>{preset.name}</span>
+                <small>{preset.mode}</small>
               </button>
             ))}
           </div>
@@ -578,7 +678,7 @@ function ThemeMenu({ isOpen, onThemeChange, onToggle, onValueChange, theme }) {
                 {label}
                 <input
                   aria-label={label}
-                  className="h-9 w-12 rounded-full border border-white/10 bg-transparent"
+                  className="theme-color-input"
                   type="color"
                   value={colorInputValue(theme[key])}
                   onChange={(event) => onValueChange(key, event.target.value)}
@@ -705,13 +805,43 @@ async function copyMarkdown(markdown) {
 
 function readTheme() {
   try {
-    return {
-      ...themePresets.axolotl,
-      ...JSON.parse(localStorage.getItem("instabrief-theme") || "{}")
-    };
+    return normalizeTheme(JSON.parse(localStorage.getItem("instabrief-theme") || "{}"));
   } catch {
-    return themePresets.axolotl;
+    return themePresets.focus;
   }
+}
+
+function normalizeTheme(savedTheme = {}) {
+  const mode = readThemeMode(savedTheme);
+  const fallback = defaultThemeByMode[mode];
+  const normalized = {
+    ...fallback,
+    ...savedTheme,
+    mode
+  };
+
+  themeColorFields.forEach((field) => {
+    if (!isThemeColor(normalized[field])) {
+      normalized[field] = fallback[field];
+    }
+  });
+
+  return normalized;
+}
+
+function readThemeMode(theme) {
+  if (theme?.mode === "light" || theme?.mode === "dark") {
+    return theme.mode;
+  }
+
+  if (theme?.name) {
+    const preset = Object.values(themePresets).find((item) => item.name === theme.name);
+    if (preset) {
+      return preset.mode;
+    }
+  }
+
+  return isLikelyLightColor(theme?.bg) ? "light" : "dark";
 }
 
 function readHistory() {
@@ -744,12 +874,29 @@ function formatHistoryDate(value) {
     : date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
-function hexToRgb(value = "#ff87be") {
+function hexToRgb(value = "#3b82f6") {
   const normalized = colorInputValue(value).replace("#", "");
   const number = parseInt(normalized, 16);
   return `${(number >> 16) & 255}, ${(number >> 8) & 255}, ${number & 255}`;
 }
 
-function colorInputValue(value = "#ff87be") {
-  return /^#[0-9a-f]{6}$/i.test(value) ? value : "#ff87be";
+function colorInputValue(value = "#3b82f6") {
+  return isThemeColor(value) ? value : "#3b82f6";
+}
+
+function isThemeColor(value) {
+  return /^#[0-9a-f]{6}$/i.test(value);
+}
+
+function isLikelyLightColor(value) {
+  if (!isThemeColor(value)) {
+    return true;
+  }
+
+  const normalized = value.replace("#", "");
+  const red = parseInt(normalized.slice(0, 2), 16) / 255;
+  const green = parseInt(normalized.slice(2, 4), 16) / 255;
+  const blue = parseInt(normalized.slice(4, 6), 16) / 255;
+  const luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  return luminance > 0.6;
 }
