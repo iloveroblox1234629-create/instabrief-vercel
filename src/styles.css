@@ -79,11 +79,11 @@ input[type="color"] {
   background-size: 54px 54px;
 }
 
-.app-shell[data-theme-name="engineering"] {
+.app-shell[data-theme-name="swiss"] {
   --theme-border: #e5e5e5;
-  --theme-border-strong: #000000;
+  --theme-border-strong: #0a0a0a;
   --theme-shadow: none;
-  background: #f6f8f7;
+  background: #ffffff;
 }
 
 .tool-panel,
@@ -112,12 +112,12 @@ input[type="color"] {
   background: #000000;
 }
 
-.app-shell[data-theme-name="engineering"] .tool-panel,
-.app-shell[data-theme-name="engineering"] .theme-menu,
-.app-shell[data-theme-name="engineering"] .workspace-header,
-.app-shell[data-theme-name="engineering"] .history-card,
-.app-shell[data-theme-name="engineering"] .info-card {
-  background: #f6f8f7;
+.app-shell[data-theme-name="swiss"] .tool-panel,
+.app-shell[data-theme-name="swiss"] .theme-menu,
+.app-shell[data-theme-name="swiss"] .workspace-header,
+.app-shell[data-theme-name="swiss"] .history-card,
+.app-shell[data-theme-name="swiss"] .info-card {
+  background: #ffffff;
 }
 
 .app-shell[data-theme-name="collective"] .tool-panel,
@@ -146,39 +146,50 @@ input[type="color"] {
   border-radius: 4.5px;
 }
 
-.app-shell[data-theme-name="engineering"] .tool-panel,
-.app-shell[data-theme-name="engineering"] .theme-menu,
-.app-shell[data-theme-name="engineering"] .workspace-header,
-.app-shell[data-theme-name="engineering"] .workspace-header-aside span,
-.app-shell[data-theme-name="engineering"] .panel-state-pill,
-.app-shell[data-theme-name="engineering"] .field-summary,
-.app-shell[data-theme-name="engineering"] .settings-band,
-.app-shell[data-theme-name="engineering"] .details-panel,
-.app-shell[data-theme-name="engineering"] .status-band,
-.app-shell[data-theme-name="engineering"] .status-step,
-.app-shell[data-theme-name="engineering"] .history-card,
-.app-shell[data-theme-name="engineering"] .info-card,
-.app-shell[data-theme-name="engineering"] .nav-links,
-.app-shell[data-theme-name="engineering"] .nav-link,
-.app-shell[data-theme-name="engineering"] .app-input,
-.app-shell[data-theme-name="engineering"] .secondary-button,
-.app-shell[data-theme-name="engineering"] .tiny-button,
-.app-shell[data-theme-name="engineering"] .theme-trigger,
-.app-shell[data-theme-name="engineering"] .theme-mode-button,
-.app-shell[data-theme-name="engineering"] .theme-preset,
-.app-shell[data-theme-name="engineering"] .theme-color-input,
-.app-shell[data-theme-name="engineering"] .tag-row span,
-.app-shell[data-theme-name="engineering"] .empty-history {
-  border-radius: 0;
+.app-shell[data-theme-name="swiss"] .tool-panel,
+.app-shell[data-theme-name="swiss"] .theme-menu,
+.app-shell[data-theme-name="swiss"] .workspace-header,
+.app-shell[data-theme-name="swiss"] .workspace-header-aside span,
+.app-shell[data-theme-name="swiss"] .panel-state-pill,
+.app-shell[data-theme-name="swiss"] .field-summary,
+.app-shell[data-theme-name="swiss"] .settings-band,
+.app-shell[data-theme-name="swiss"] .details-panel,
+.app-shell[data-theme-name="swiss"] .status-band,
+.app-shell[data-theme-name="swiss"] .status-step,
+.app-shell[data-theme-name="swiss"] .history-card,
+.app-shell[data-theme-name="swiss"] .info-card,
+.app-shell[data-theme-name="swiss"] .nav-links,
+.app-shell[data-theme-name="swiss"] .nav-link,
+.app-shell[data-theme-name="swiss"] .app-input,
+.app-shell[data-theme-name="swiss"] .secondary-button,
+.app-shell[data-theme-name="swiss"] .tiny-button,
+.app-shell[data-theme-name="swiss"] .theme-trigger,
+.app-shell[data-theme-name="swiss"] .theme-mode-button,
+.app-shell[data-theme-name="swiss"] .theme-preset,
+.app-shell[data-theme-name="swiss"] .theme-color-input,
+.app-shell[data-theme-name="swiss"] .tag-row span,
+.app-shell[data-theme-name="swiss"] .empty-history {
+  border-radius: 10px;
 }
 
-.app-shell[data-theme-name="engineering"] .tool-panel,
-.app-shell[data-theme-name="engineering"] .theme-menu,
-.app-shell[data-theme-name="engineering"] .workspace-header,
-.app-shell[data-theme-name="engineering"] .history-card,
-.app-shell[data-theme-name="engineering"] .info-card,
-.app-shell[data-theme-name="engineering"] .nav-links {
+.app-shell[data-theme-name="swiss"] .tool-panel,
+.app-shell[data-theme-name="swiss"] .theme-menu,
+.app-shell[data-theme-name="swiss"] .workspace-header,
+.app-shell[data-theme-name="swiss"] .history-card,
+.app-shell[data-theme-name="swiss"] .nav-links {
   box-shadow: none;
+}
+
+.app-shell[data-theme-name="swiss"] .history-card,
+.app-shell[data-theme-name="swiss"] .info-card,
+.app-shell[data-theme-name="swiss"] .tool-panel,
+.app-shell[data-theme-name="swiss"] .theme-menu,
+.app-shell[data-theme-name="swiss"] .workspace-header {
+  border-radius: 14px;
+}
+
+.app-shell[data-theme-name="swiss"] .tag-row span {
+  border-radius: 26px;
 }
 
 .tool-panel {
@@ -233,37 +244,35 @@ input[type="color"] {
   color: #5a5a5a;
 }
 
-.app-shell[data-theme-name="engineering"] {
-  font-weight: 100;
+.app-shell[data-theme-name="swiss"] h1,
+.app-shell[data-theme-name="swiss"] h2,
+.app-shell[data-theme-name="swiss"] h3,
+.app-shell[data-theme-name="swiss"] .brand-link,
+.app-shell[data-theme-name="swiss"] .field-label,
+.app-shell[data-theme-name="swiss"] .details-summary,
+.app-shell[data-theme-name="swiss"] .primary-button,
+.app-shell[data-theme-name="swiss"] .secondary-button,
+.app-shell[data-theme-name="swiss"] .tiny-button,
+.app-shell[data-theme-name="swiss"] .theme-mode-button,
+.app-shell[data-theme-name="swiss"] .theme-preset {
+  font-weight: 500;
 }
 
-.app-shell[data-theme-name="engineering"] h1,
-.app-shell[data-theme-name="engineering"] h2,
-.app-shell[data-theme-name="engineering"] h3,
-.app-shell[data-theme-name="engineering"] .brand-link,
-.app-shell[data-theme-name="engineering"] .field-label,
-.app-shell[data-theme-name="engineering"] .details-summary,
-.app-shell[data-theme-name="engineering"] .primary-button,
-.app-shell[data-theme-name="engineering"] .secondary-button,
-.app-shell[data-theme-name="engineering"] .tiny-button,
-.app-shell[data-theme-name="engineering"] .theme-mode-button,
-.app-shell[data-theme-name="engineering"] .theme-preset {
-  font-weight: 300;
+.app-shell[data-theme-name="swiss"] .eyebrow,
+.app-shell[data-theme-name="swiss"] .brand-subtitle,
+.app-shell[data-theme-name="swiss"] .status-copy,
+.app-shell[data-theme-name="swiss"] .status-step,
+.app-shell[data-theme-name="swiss"] .theme-preset small {
+  color: #737373;
+  font-weight: 500;
 }
 
-.app-shell[data-theme-name="engineering"] .eyebrow,
-.app-shell[data-theme-name="engineering"] .brand-subtitle,
-.app-shell[data-theme-name="engineering"] .status-copy,
-.app-shell[data-theme-name="engineering"] .status-step,
-.app-shell[data-theme-name="engineering"] .theme-preset small {
-  color: #5a5a5a;
-  font-weight: 100;
-}
-
-.app-shell[data-theme-name="engineering"] h1 {
-  max-width: 24ch;
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  line-height: 1.11;
+.app-shell[data-theme-name="swiss"] h1 {
+  max-width: 20ch;
+  font-size: clamp(2.4rem, 5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
 }
 
 .tool-panel-header {
@@ -296,12 +305,12 @@ input[type="color"] {
   color: #ffffff;
 }
 
-.app-shell[data-theme-name="engineering"] .panel-state-pill,
-.app-shell[data-theme-name="engineering"] .status-step-active,
-.app-shell[data-theme-name="engineering"] .tag-row span {
-  border-color: #000000;
-  background: #f6f8f7;
-  color: #000000;
+.app-shell[data-theme-name="swiss"] .panel-state-pill,
+.app-shell[data-theme-name="swiss"] .status-step-active,
+.app-shell[data-theme-name="swiss"] .tag-row span {
+  border-color: #e5e5e5;
+  background: #f2f2f2;
+  color: #0a0a0a;
 }
 
 .form-grid {
@@ -350,17 +359,17 @@ input[type="color"] {
   background: #000000;
 }
 
-.app-shell[data-theme-name="engineering"] .field-summary,
-.app-shell[data-theme-name="engineering"] .settings-band,
-.app-shell[data-theme-name="engineering"] .details-panel,
-.app-shell[data-theme-name="engineering"] .status-band,
-.app-shell[data-theme-name="engineering"] .workspace-header-aside span,
-.app-shell[data-theme-name="engineering"] .secondary-button,
-.app-shell[data-theme-name="engineering"] .tiny-button,
-.app-shell[data-theme-name="engineering"] .theme-mode-button,
-.app-shell[data-theme-name="engineering"] .theme-preset,
-.app-shell[data-theme-name="engineering"] .empty-history {
-  background: #f6f8f7;
+.app-shell[data-theme-name="swiss"] .field-summary,
+.app-shell[data-theme-name="swiss"] .settings-band,
+.app-shell[data-theme-name="swiss"] .details-panel,
+.app-shell[data-theme-name="swiss"] .status-band,
+.app-shell[data-theme-name="swiss"] .workspace-header-aside span,
+.app-shell[data-theme-name="swiss"] .secondary-button,
+.app-shell[data-theme-name="swiss"] .tiny-button,
+.app-shell[data-theme-name="swiss"] .theme-mode-button,
+.app-shell[data-theme-name="swiss"] .theme-preset,
+.app-shell[data-theme-name="swiss"] .empty-history {
+  background: #ffffff;
 }
 
 .field-summary strong {
@@ -523,18 +532,18 @@ input[type="color"] {
   color: #ffffff;
 }
 
-.app-shell[data-theme-name="engineering"] .nav-links {
+.app-shell[data-theme-name="swiss"] .nav-links {
   border-top-color: #e5e5e5;
-  border-right-color: transparent;
+  border-right-color: #e5e5e5;
   border-bottom-color: #e5e5e5;
-  border-left-color: transparent;
+  border-left-color: #e5e5e5;
 }
 
-.app-shell[data-theme-name="engineering"] .nav-link:hover,
-.app-shell[data-theme-name="engineering"] .nav-link-active {
-  border-color: #000000;
-  background: #f6f8f7;
-  color: #000000;
+.app-shell[data-theme-name="swiss"] .nav-link:hover,
+.app-shell[data-theme-name="swiss"] .nav-link-active {
+  border-color: #e5e5e5;
+  background: #f2f2f2;
+  color: #0a0a0a;
 }
 
 .app-input {
@@ -559,14 +568,11 @@ input[type="color"] {
   font-weight: 400;
 }
 
-.app-shell[data-theme-name="engineering"] .app-input {
-  background: #f6f8f7;
+.app-shell[data-theme-name="swiss"] .app-input {
+  background: #ffffff;
   border-color: #e5e5e5;
-  border-top-color: transparent;
-  border-right-color: transparent;
-  border-left-color: transparent;
-  color: #000000;
-  font-weight: 100;
+  color: #0a0a0a;
+  font-weight: 400;
 }
 
 .app-input::placeholder {
@@ -624,13 +630,16 @@ select.app-input {
   box-shadow: none;
 }
 
-.app-shell[data-theme-name="engineering"] .primary-button {
-  border-color: #000000;
+.app-shell[data-theme-name="swiss"] .primary-button {
+  border-color: #0a0a0a;
+  background: #0a0a0a;
+  color: #ffffff;
   box-shadow: none;
 }
 
-.app-shell[data-theme-name="engineering"] .primary-button:hover {
-  border-color: #0f0e12;
+.app-shell[data-theme-name="swiss"] .primary-button:hover {
+  border-color: #171717;
+  background: #171717;
   box-shadow: none;
 }
 
@@ -695,23 +704,23 @@ select.app-input {
   color: #ffffff;
 }
 
-.app-shell[data-theme-name="engineering"] .secondary-button,
-.app-shell[data-theme-name="engineering"] .tiny-button,
-.app-shell[data-theme-name="engineering"] .theme-mode-button,
-.app-shell[data-theme-name="engineering"] .theme-preset {
-  color: #000000;
+.app-shell[data-theme-name="swiss"] .secondary-button,
+.app-shell[data-theme-name="swiss"] .tiny-button,
+.app-shell[data-theme-name="swiss"] .theme-mode-button,
+.app-shell[data-theme-name="swiss"] .theme-preset {
+  color: #0a0a0a;
 }
 
-.app-shell[data-theme-name="engineering"] .secondary-button:hover,
-.app-shell[data-theme-name="engineering"] .secondary-button-accent,
-.app-shell[data-theme-name="engineering"] .tiny-button:hover,
-.app-shell[data-theme-name="engineering"] .theme-mode-button:hover,
-.app-shell[data-theme-name="engineering"] .theme-mode-button-active,
-.app-shell[data-theme-name="engineering"] .theme-preset-active,
-.app-shell[data-theme-name="engineering"] .theme-preset:hover {
-  border-color: #000000;
-  background: #ffffff;
-  color: #000000;
+.app-shell[data-theme-name="swiss"] .secondary-button:hover,
+.app-shell[data-theme-name="swiss"] .secondary-button-accent,
+.app-shell[data-theme-name="swiss"] .tiny-button:hover,
+.app-shell[data-theme-name="swiss"] .theme-mode-button:hover,
+.app-shell[data-theme-name="swiss"] .theme-mode-button-active,
+.app-shell[data-theme-name="swiss"] .theme-preset-active,
+.app-shell[data-theme-name="swiss"] .theme-preset:hover {
+  border-color: #e5e5e5;
+  background: #f2f2f2;
+  color: #0a0a0a;
 }
 
 .secondary-button:hover {
@@ -745,9 +754,9 @@ select.app-input {
   box-shadow: 0 0 0 1px #5a5a5a;
 }
 
-.app-shell[data-theme-name="engineering"] .status-dot {
-  background: #000000;
-  box-shadow: 0 0 0 1px #000000;
+.app-shell[data-theme-name="swiss"] .status-dot {
+  background: #0a0a0a;
+  box-shadow: 0 0 0 1px #e5e5e5;
 }
 
 .status-dot-busy {
@@ -922,17 +931,17 @@ select.app-input {
   box-shadow: none;
 }
 
-.app-shell[data-theme-name="engineering"] .theme-trigger {
-  background: #f6f8f7;
+.app-shell[data-theme-name="swiss"] .theme-trigger {
+  background: #ffffff;
   box-shadow: none;
 }
 
-.app-shell[data-theme-name="engineering"] .workspace-header {
-  border-top-color: #000000;
+.app-shell[data-theme-name="swiss"] .workspace-header {
+  border-top-color: #e5e5e5;
 }
 
-.app-shell[data-theme-name="engineering"] .history-panel {
-  border-top-color: #0f0e12;
+.app-shell[data-theme-name="swiss"] .history-panel {
+  border-top-color: #e5e5e5;
 }
 
 .theme-trigger-dot {

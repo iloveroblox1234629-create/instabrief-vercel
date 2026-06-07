@@ -12,8 +12,18 @@ import {
 } from "./extraction.js";
 import { pathForView, readSharedTextFromUrl, resolveViewFromUrl } from "./routing.js";
 
+const defaultThemeAction = {
+  cta: "#9a3412",
+  ctaHover: "#7c2d12",
+  ctaText: "#ffffff"
+};
+
+const legacyThemeSlugs = {
+  engineering: "swiss"
+};
+
 const themePresets = {
-  focus: {
+  focus: createTheme({
     name: "Focus",
     slug: "focus",
     mode: "light",
@@ -22,12 +32,9 @@ const themePresets = {
     text: "#0f172a",
     muted: "#475569",
     accent: "#2563eb",
-    soft: "#eef6ff",
-    cta: "#9a3412",
-    ctaHover: "#7c2d12",
-    ctaText: "#ffffff"
-  },
-  graphite: {
+    soft: "#eef6ff"
+  }),
+  graphite: createTheme({
     name: "Graphite",
     slug: "graphite",
     mode: "dark",
@@ -36,12 +43,9 @@ const themePresets = {
     text: "#f8fafc",
     muted: "#94a3b8",
     accent: "#60a5fa",
-    soft: "#1e293b",
-    cta: "#9a3412",
-    ctaHover: "#7c2d12",
-    ctaText: "#ffffff"
-  },
-  copper: {
+    soft: "#1e293b"
+  }),
+  copper: createTheme({
     name: "Copper",
     slug: "copper",
     mode: "light",
@@ -50,26 +54,22 @@ const themePresets = {
     text: "#0f172a",
     muted: "#475569",
     accent: "#c2410c",
-    soft: "#ffedd5",
-    cta: "#9a3412",
-    ctaHover: "#7c2d12",
-    ctaText: "#ffffff"
-  },
-  engineering: {
-    name: "Engineering",
-    slug: "engineering",
+    soft: "#ffedd5"
+  }),
+  swiss: createTheme({
+    name: "Swiss",
+    slug: "swiss",
     mode: "light",
-    bg: "#f6f8f7",
-    panel: "#f6f8f7",
-    text: "#000000",
-    muted: "#5a5a5a",
-    accent: "#000000",
-    soft: "#ffffff",
-    cta: "#000000",
-    ctaHover: "#0f0e12",
-    ctaText: "#f6f8f7"
-  },
-  collective: {
+    bg: "#ffffff",
+    panel: "#ffffff",
+    text: "#0a0a0a",
+    muted: "#737373",
+    accent: "#0a0a0a",
+    soft: "#f2f2f2",
+    cta: "#0a0a0a",
+    ctaHover: "#171717"
+  }),
+  collective: createTheme({
     name: "Collective",
     slug: "collective",
     mode: "dark",
@@ -82,7 +82,7 @@ const themePresets = {
     cta: "#ffffff",
     ctaHover: "#ffffff",
     ctaText: "#000000"
-  }
+  })
 };
 
 const defaultThemeByMode = {
@@ -107,6 +107,13 @@ const SUMMARY_TIMEOUT_MS = 25000;
 const HISTORY_KEY = "instabrief-markdown-history";
 const MAX_HISTORY_ITEMS = 20;
 const templates = extractionTemplates();
+
+function createTheme(theme) {
+  return {
+    ...defaultThemeAction,
+    ...theme
+  };
+}
 
 export default function App() {
   const [view, setView] = useState(() => resolveViewFromUrl(window.location.href));
@@ -860,13 +867,15 @@ function readTheme() {
 }
 
 function normalizeTheme(savedTheme = {}) {
-  const mode = readThemeMode(savedTheme);
+  const preset = findThemePreset(savedTheme);
+  const sourceTheme = preset ? mergeThemePreset(preset, savedTheme) : savedTheme;
+  const mode = readThemeMode(sourceTheme);
   const fallback = defaultThemeByMode[mode];
   const normalized = {
     ...fallback,
-    ...savedTheme,
+    ...sourceTheme,
     mode,
-    slug: savedTheme.slug || fallback.slug
+    slug: sourceTheme.slug || fallback.slug
   };
 
   themeColorFields.forEach((field) => {
@@ -876,6 +885,26 @@ function normalizeTheme(savedTheme = {}) {
   });
 
   return normalized;
+}
+
+function findThemePreset(theme = {}) {
+  const slug = legacyThemeSlugs[theme.slug] || theme.slug;
+  return Object.values(themePresets).find((preset) => (
+    preset.slug === slug || preset.name === theme.name
+  )) || null;
+}
+
+function mergeThemePreset(preset, savedTheme = {}) {
+  if (legacyThemeSlugs[savedTheme.slug]) {
+    return preset;
+  }
+
+  return {
+    ...preset,
+    ...savedTheme,
+    name: preset.name,
+    slug: preset.slug
+  };
 }
 
 function readThemeMode(theme) {
