@@ -2,7 +2,7 @@
 
 React + Tailwind version of InstaBrief with browser-local extraction and an optional Vercel API route for OpenRouter summaries.
 
-Production: https://instabrief-vercel.vercel.app
+Production: https://instabrief.xyz
 
 ## Summary Modes
 
