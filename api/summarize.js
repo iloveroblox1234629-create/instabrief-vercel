@@ -11,6 +11,7 @@ const MAX_FIELD_LENGTH = 6000;
 const METADATA_TIMEOUT_MS = 4500;
 const OPENROUTER_TIMEOUT_MS = 20000;
 const DEFAULT_APP_ORIGIN = "https://instabrief-vercel.vercel.app";
+const RETIRED_OPENROUTER_MODELS = new Set(["openai/gpt-oss-120b:free"]);
 const INSTAGRAM_MEDIA_URL_RE = /https?:\/\/(?:www\.)?instagram\.com\/(?:reel|reels|p|tv)\/[A-Za-z0-9_.-]+\/?(?:\?[^)\]\s"'<>]*)?/gi;
 
 export default async function handler(request, response) {
@@ -34,6 +35,7 @@ export default async function handler(request, response) {
     return response.status(400).json({ error: "A supported Instagram media URL is required." });
   }
   const prompt = await createPrompt(payload);
+  const model = configuredOpenRouterModel();
 
   try {
     const openRouterResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -46,7 +48,7 @@ export default async function handler(request, response) {
         "X-Title": "InstaBrief"
       },
       body: JSON.stringify({
-        model: process.env.OPENROUTER_MODEL || defaultOpenRouterModel(),
+        model,
         messages: [
           {
             role: "system",
@@ -83,7 +85,7 @@ export default async function handler(request, response) {
       takeaways: normalizeArray(summary.takeaways),
       actions: normalizeArray(summary.actions),
       tags: normalizeArray(summary.tags),
-      model: body.model || process.env.OPENROUTER_MODEL || defaultOpenRouterModel()
+      model: body.model || model
     });
   } catch (error) {
     if (isTimeoutError(error)) {
@@ -95,6 +97,13 @@ export default async function handler(request, response) {
       error: error instanceof Error ? error.message : "AI summarization failed."
     });
   }
+}
+
+function configuredOpenRouterModel() {
+  const configuredModel = process.env.OPENROUTER_MODEL?.trim();
+  return configuredModel && !RETIRED_OPENROUTER_MODELS.has(configuredModel)
+    ? configuredModel
+    : defaultOpenRouterModel();
 }
 
 async function createPrompt(payload) {

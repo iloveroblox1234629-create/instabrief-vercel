@@ -21,7 +21,7 @@ const STOP_WORDS = new Set([
   "with",
   "your"
 ]);
-const DEFAULT_OPENROUTER_MODEL = "openai/gpt-oss-120b:free";
+const DEFAULT_OPENROUTER_MODEL = "openai/gpt-oss-20b:free";
 const DEFAULT_TEMPLATE_ID = "general";
 const EXTRACTION_TEMPLATES = [
   {

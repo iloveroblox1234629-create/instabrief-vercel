@@ -20,7 +20,10 @@ describe("summarize API", () => {
     delete process.env.OPENROUTER_MODEL;
     process.env.OPENROUTER_API_KEY = "test-key";
     let requestBody;
-    globalThis.fetch = async (_url, options) => {
+    globalThis.fetch = async (url, options = {}) => {
+      if (String(url).includes("instagram.com")) {
+        return { ok: false, status: 404, text: async () => "" };
+      }
       requestBody = JSON.parse(options.body);
       return {
         ok: true,
@@ -49,8 +52,48 @@ describe("summarize API", () => {
       body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
     }, response);
 
-    assert.equal(requestBody.model, "openai/gpt-oss-120b:free");
+    assert.equal(requestBody.model, "openai/gpt-oss-20b:free");
     assert.match(requestBody.messages[1].content, /Template: General/);
+    assert.equal(response.statusCode, 200);
+  });
+
+  it("replaces the retired free model when it is still configured in the environment", async () => {
+    process.env.OPENROUTER_API_KEY = "test-key";
+    process.env.OPENROUTER_MODEL = "openai/gpt-oss-120b:free";
+    let requestBody;
+    globalThis.fetch = async (url, options = {}) => {
+      if (String(url).includes("instagram.com")) {
+        return { ok: false, status: 404, text: async () => "" };
+      }
+      requestBody = JSON.parse(options.body);
+      return {
+        ok: true,
+        json: async () => ({
+          model: requestBody.model,
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  summarySentence: "A summary from the replacement model.",
+                  takeaways: ["Keep stale deployment settings compatible."],
+                  actions: ["Redeploy after updating the model."],
+                  tags: ["compatibility"]
+                })
+              }
+            }
+          ]
+        })
+      };
+    };
+
+    const response = createResponse();
+    await handler({
+      method: "POST",
+      headers: allowedHeaders(),
+      body: { rawUrls: "https://www.instagram.com/reel/ABC123/" }
+    }, response);
+
+    assert.equal(requestBody.model, "openai/gpt-oss-20b:free");
     assert.equal(response.statusCode, 200);
   });
 
